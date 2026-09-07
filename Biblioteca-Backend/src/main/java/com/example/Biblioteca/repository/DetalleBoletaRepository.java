@@ -1,5 +1,7 @@
 package com.example.Biblioteca.repository;
 
-public class DetalleBoletaRepository {
-    
+import com.example.Biblioteca.entity.DetalleBoleta;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface DetalleBoletaRepository extends JpaRepository<DetalleBoleta, Long> {
 }
