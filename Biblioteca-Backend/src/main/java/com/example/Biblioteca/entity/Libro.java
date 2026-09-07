@@ -20,4 +20,7 @@ public class Libro {
     private Integer anioPublicacion;
     private BigDecimal precio;
     private Integer stock;
+
+    @Column(length = 500)
+    private String portada;       // URL de la imagen de portada
 }
