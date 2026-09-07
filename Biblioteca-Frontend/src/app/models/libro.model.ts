@@ -1,10 +1,11 @@
 export interface Libro {
-  id: number;              // <-- Quita el '?' para que sea obligatorio
+  id: number;
   nombre: string;
   tipo: 'DIGITAL' | 'FISICO';
   editorial: string;
   anioPublicacion: number;
   precio: number;
   stock: number;
-  portada?: string;        // Este sí puede ser opcional
+  portada?: string;
+  autor?: string;   // 👈 AÑADIR ESTE CAMPO
 }
