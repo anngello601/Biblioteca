@@ -2,13 +2,15 @@ package com.example.Biblioteca.service;
 
 import com.example.Biblioteca.entity.Usuario;
 import com.example.Biblioteca.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UsuarioService {
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
+
+    public UsuarioService(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
+    }
 
     public Usuario registrar(Usuario usuario) {
         // En producción, aquí deberías encriptar la contraseña

@@ -28,6 +28,10 @@ public class CarritoService {
     }
 
     public int getCantidadTotal() {
-        return items.values().stream().mapToInt(Integer::intValue).sum();
+        int total = 0;
+        for (Integer cantidad : items.values()) {
+            total += cantidad;
+        }
+        return total;
     }
 }

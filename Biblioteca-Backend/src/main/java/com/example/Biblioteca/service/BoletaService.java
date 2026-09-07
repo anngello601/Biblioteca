@@ -2,9 +2,7 @@ package com.example.Biblioteca.service;
 
 import com.example.Biblioteca.entity.*;
 import com.example.Biblioteca.repository.BoletaRepository;
-import com.example.Biblioteca.repository.DetalleBoletaRepository;
 import com.example.Biblioteca.repository.LibroRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,12 +14,14 @@ import java.util.Map;
 
 @Service
 public class BoletaService {
-    @Autowired
-    private BoletaRepository boletaRepository;
-    @Autowired
-    private DetalleBoletaRepository detalleBoletaRepository;
-    @Autowired
-    private LibroRepository libroRepository;
+    private final BoletaRepository boletaRepository;
+    private final LibroRepository libroRepository;
+
+    public BoletaService(BoletaRepository boletaRepository,
+                         LibroRepository libroRepository) {
+        this.boletaRepository = boletaRepository;
+        this.libroRepository = libroRepository;
+    }
 
     @Transactional
     public Boleta generarBoleta(Usuario usuario, Map<Long, Integer> items) {
