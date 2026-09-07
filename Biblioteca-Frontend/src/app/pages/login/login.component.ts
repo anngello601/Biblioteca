@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -31,6 +31,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
+  // login.component.ts (ya funciona)
   onSubmit() {
     this.authService.login(this.email, this.password).subscribe({
       next: () => this.router.navigate(['/libros']),

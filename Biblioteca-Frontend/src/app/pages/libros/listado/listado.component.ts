@@ -18,18 +18,19 @@ export class ListadoComponent {
   private libroService = inject(LibroService);
   private carritoService = inject(CarritoService);
 
-  // 🔥 Señales privadas (solo para uso interno)
+  // Señales privadas
   private librosSignal = signal<Libro[]>([]);
   private cargandoSignal = signal(false);
   private paginaSignal = signal(0);
   private tamanioSignal = signal(12);
   private totalPaginasSignal = signal(0);
   private totalElementosSignal = signal(0);
+  private agregandoSignal = signal(false); // 🔥 Nuevo: para mostrar spinner en el botón
 
-  // 🔥 Señales públicas (para usar en el template)
-  filtroSignal = signal(''); // 👈 AHORA ES PÚBLICA
+  // Señales públicas
+  filtroSignal = signal('');
 
-  // Exponer como readonly las señales que se usan en el template
+  // Exponer como readonly
   readonly libros = this.librosSignal.asReadonly();
   readonly cargando = this.cargandoSignal.asReadonly();
   readonly totalPaginas = this.totalPaginasSignal.asReadonly();
@@ -56,6 +57,7 @@ export class ListadoComponent {
       },
       error: (err) => {
         console.error('Error al cargar:', err);
+        alert('Error al cargar los libros. Revisa la consola.');
         this.cargandoSignal.set(false);
       }
     });
@@ -81,19 +83,44 @@ export class ListadoComponent {
   }
 
   agregarAlCarrito(id: number, cantidad: number = 1) {
-    if (!id) return;
+    if (!id) {
+      alert('ID de libro inválido');
+      return;
+    }
+    
+    // Activar el spinner en el botón
+    this.agregandoSignal.set(true);
+    
     this.carritoService.agregar(id, cantidad).subscribe({
-      next: () => alert('✅ Agregado al carrito'),
-      error: (err) => alert('❌ Error al agregar')
+      next: () => {
+        this.agregandoSignal.set(false);
+        alert('✅ Libro agregado al carrito');
+      },
+      error: (err) => {
+        this.agregandoSignal.set(false);
+        console.error('Error al agregar al carrito:', err);
+        alert('❌ Error al agregar el libro al carrito: ' + (err.error || err.message));
+      }
     });
   }
 
   eliminar(id: number) {
-    if (!id) return;
-    if (confirm('¿Eliminar este libro?')) {
+    if (!id) {
+      alert('ID de libro inválido');
+      return;
+    }
+    
+    if (confirm('¿Eliminar este libro permanentemente?')) {
       this.libroService.eliminar(id).subscribe({
-        next: () => this.cargarLibros(this.filtroSignal(), this.paginaSignal(), this.tamanioSignal()),
-        error: (err) => console.error('Error al eliminar:', err)
+        next: () => {
+          alert('✅ Libro eliminado correctamente');
+          // Recargar la lista con el filtro actual
+          this.cargarLibros(this.filtroSignal(), this.paginaSignal(), this.tamanioSignal());
+        },
+        error: (err) => {
+          console.error('Error al eliminar:', err);
+          alert('❌ Error al eliminar el libro: ' + (err.error || err.message));
+        }
       });
     }
   }

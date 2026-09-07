@@ -1,13 +1,20 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
   <div class="container">
-    <a class="navbar-brand fw-bold" routerLink="/">
-      <i class="fas fa-book-open me-2"></i>BookStore
+    <!-- Logo -->
+    <a class="navbar-brand fw-bold d-flex align-items-center" routerLink="/">
+      <i class="fas fa-book-open me-2"></i>
+      <span>BookStore</span>
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+
+    <!-- Toggler para móviles -->
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+            aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto">
+
+    <!-- Menú -->
+    <div class="collapse navbar-collapse" id="navbarMain">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
           <a class="nav-link" routerLink="/libros" routerLinkActive="active">
             <i class="fas fa-th-list me-1"></i> Catálogo
@@ -22,25 +29,39 @@
           </li>
         }
       </ul>
+
+      <!-- Acciones derecha -->
       <ul class="navbar-nav">
         @if (!usuario) {
           <li class="nav-item">
-            <a class="nav-link" routerLink="/login">
+            <a class="nav-link btn-nav" routerLink="/login">
               <i class="fas fa-sign-in-alt me-1"></i> Iniciar sesión
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="/registro">
+            <a class="nav-link btn-nav btn-register" routerLink="/registro">
               <i class="fas fa-user-plus me-1"></i> Registrarse
             </a>
           </li>
         } @else {
+          <!-- Dropdown del usuario -->
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-              <i class="fas fa-user-circle me-1"></i> {{ usuario.nombre }}
+            <a class="nav-link dropdown-toggle d-flex align-items-center" 
+               href="#" id="userDropdown" role="button" 
+               data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-user-circle fs-5 me-1"></i>
+              <span>{{ usuario.nombre }}</span>
             </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" (click)="logout()"><i class="fas fa-sign-out-alt me-2"></i>Cerrar sesión</a></li>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userDropdown">
+              <li><span class="dropdown-item-text text-muted">
+                <i class="fas fa-envelope me-2"></i>{{ usuario.email }}
+              </span></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item text-danger" (click)="logout()" style="cursor:pointer;">
+                  <i class="fas fa-sign-out-alt me-2"></i> Cerrar sesión
+                </a>
+              </li>
             </ul>
           </li>
         }
