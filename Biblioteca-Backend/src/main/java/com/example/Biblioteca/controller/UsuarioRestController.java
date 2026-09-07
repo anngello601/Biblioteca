@@ -3,6 +3,9 @@ package com.example.Biblioteca.controller;
 import com.example.Biblioteca.entity.Usuario;
 import com.example.Biblioteca.service.UsuarioService;
 import jakarta.servlet.http.HttpSession;
+
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,6 +50,11 @@ public class UsuarioRestController {
             return ResponseEntity.ok(usuario);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @GetMapping
+    public List<Usuario> listarUsuarios() {
+        return usuarioService.listarTodos();
     }
 }
 
