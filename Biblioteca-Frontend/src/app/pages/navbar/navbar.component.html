@@ -1,0 +1,50 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+  <div class="container">
+    <a class="navbar-brand fw-bold" routerLink="/">
+      <i class="fas fa-book-open me-2"></i>BookStore
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/libros" routerLinkActive="active">
+            <i class="fas fa-th-list me-1"></i> Catálogo
+          </a>
+        </li>
+        @if (usuario) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/carrito" routerLinkActive="active">
+              <i class="fas fa-shopping-cart me-1"></i> Carrito
+              <span class="badge bg-warning text-dark ms-1">{{ cantidadCarrito }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+      <ul class="navbar-nav">
+        @if (!usuario) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/login">
+              <i class="fas fa-sign-in-alt me-1"></i> Iniciar sesión
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/registro">
+              <i class="fas fa-user-plus me-1"></i> Registrarse
+            </a>
+          </li>
+        } @else {
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-user-circle me-1"></i> {{ usuario.nombre }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" (click)="logout()"><i class="fas fa-sign-out-alt me-2"></i>Cerrar sesión</a></li>
+            </ul>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</nav>

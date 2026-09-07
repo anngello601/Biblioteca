@@ -1,0 +1,72 @@
+<div class="container py-4">
+  @if (loading) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="mt-2">Cargando libro...</p>
+    </div>
+  } @else if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  } @else if (libro) {
+    <div class="row g-4">
+      <div class="col-md-5">
+        <img [src]="libro.portada || 'https://via.placeholder.com/500x700?text=Sin+portada'" 
+             class="img-fluid rounded shadow-lg" [alt]="'Portada de ' + libro.nombre"
+             style="max-height: 500px; width: auto;">
+      </div>
+      <div class="col-md-7">
+        <h1 class="mb-3">{{ libro.nombre }}</h1>
+        <div class="mb-3">
+          <span class="badge bg-secondary me-2">{{ libro.tipo }}</span>
+          <span class="badge bg-info text-dark">{{ libro.editorial }}</span>
+        </div>
+        <table class="table table-striped table-bordered">
+          <tbody>
+            <tr><th style="width:30%">Editorial</th><td>{{ libro.editorial || 'No especificada' }}</td></tr>
+            <tr><th>Año</th><td>{{ libro.anioPublicacion || 'No especificado' }}</td></tr>
+            <tr><th>Precio</th><td><strong class="text-success fs-5">${{ libro.precio }}</strong></td></tr>
+            <tr>
+              <th>Stock</th>
+              <td>
+                @if (libro.stock > 0) {
+                  <span class="text-success"><i class="fas fa-check-circle me-1"></i> {{ libro.stock }} unidades</span>
+                } @else {
+                  <span class="text-danger"><i class="fas fa-times-circle me-1"></i> Sin stock</span>
+                }
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        @if (libro.stock > 0) {
+          <div class="card bg-light p-3 mt-3">
+            <div class="row g-2 align-items-end">
+              <div class="col-auto">
+                <label class="form-label fw-bold">Cantidad:</label>
+                <input type="number" class="form-control" [(ngModel)]="cantidad" 
+                       min="1" [max]="libro.stock" style="width:80px;">
+              </div>
+              <div class="col-auto">
+                <button class="btn btn-success btn-lg" (click)="agregarAlCarrito()"
+                        [disabled]="cantidad < 1 || cantidad > libro.stock">
+                  <i class="fas fa-cart-plus me-2"></i> Agregar al carrito
+                </button>
+              </div>
+              <div class="col-auto">
+                <button class="btn btn-outline-secondary" (click)="volver()">
+                  <i class="fas fa-arrow-left me-1"></i> Volver
+                </button>
+              </div>
+            </div>
+            <small class="text-muted mt-2"><i class="fas fa-info-circle me-1"></i> Máximo {{ libro.stock }} unidades</small>
+          </div>
+        } @else {
+          <div class="alert alert-warning mt-3">
+            <i class="fas fa-exclamation-triangle me-2"></i> <strong>Sin stock disponible</strong>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
