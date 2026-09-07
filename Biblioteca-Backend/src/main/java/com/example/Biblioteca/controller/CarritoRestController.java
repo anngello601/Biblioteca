@@ -3,28 +3,29 @@ package com.example.Biblioteca.controller;
 import com.example.Biblioteca.entity.Libro;
 import com.example.Biblioteca.service.CarritoService;
 import com.example.Biblioteca.service.LibroService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
-@Controller
-@RequestMapping("/carrito")
-public class CarritoController {
-    private CarritoService carritoService;
-    private LibroService libroService;
+@RestController
+@RequestMapping("/api/carrito")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
+public class CarritoRestController {
 
-    public CarritoController(CarritoService carritoService, LibroService libroService) {
+    private final CarritoService carritoService;
+    private final LibroService libroService;
+
+    public CarritoRestController(CarritoService carritoService, LibroService libroService) {
         this.carritoService = carritoService;
         this.libroService = libroService;
     }
 
     @GetMapping
-    public String verCarrito(Model model) {
+    public Map<String, Object> verCarrito() {
+        Map<String, Object> response = new HashMap<>();
         Map<Long, Integer> items = carritoService.getItems();
-        Map<Libro, Integer> detalle = new LinkedHashMap<>();
+        Map<Libro, Integer> detalle = new HashMap<>();
         double total = 0;
         for (Map.Entry<Long, Integer> entry : items.entrySet()) {
             Libro libro = libroService.obtenerPorId(entry.getKey()).orElse(null);
@@ -33,26 +34,24 @@ public class CarritoController {
                 total += libro.getPrecio().doubleValue() * entry.getValue();
             }
         }
-        model.addAttribute("detalle", detalle);
-        model.addAttribute("total", total);
-        return "carrito/ver";
+        response.put("items", detalle);
+        response.put("total", total);
+        response.put("cantidadTotal", carritoService.getCantidadTotal());
+        return response;
     }
 
     @PostMapping("/agregar/{id}")
-    public String agregar(@PathVariable Long id, @RequestParam(defaultValue = "1") int cantidad) {
+    public void agregar(@PathVariable Long id, @RequestParam(defaultValue = "1") int cantidad) {
         carritoService.agregar(id, cantidad);
-        return "redirect:/carrito";
     }
 
-    @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Long id) {
+    @DeleteMapping("/{id}")
+    public void eliminar(@PathVariable Long id) {
         carritoService.eliminar(id);
-        return "redirect:/carrito";
     }
 
-    @GetMapping("/vaciar")
-    public String vaciar() {
+    @DeleteMapping("/vaciar")
+    public void vaciar() {
         carritoService.vaciar();
-        return "redirect:/carrito";
     }
 }
