@@ -28,8 +28,8 @@
                 </div>
               </td>
               <td class="text-center">{{ item.cantidad }}</td>
-              <td class="text-end">${{ item.libro.precio }}</td>
-              <td class="text-end fw-bold">${{ item.libro.precio * item.cantidad }}</td>
+              <td class="text-end">S/ {{ item.libro.precio | number:'1.2-2' }}</td>
+              <td class="text-end fw-bold">S/ {{ item.libro.precio * item.cantidad | number:'1.2-2' }}</td>
               <td class="text-center">
                 <button class="btn btn-outline-danger btn-sm" (click)="eliminar(item.libro.id!)">
                   <i class="fas fa-trash-alt"></i>
@@ -41,7 +41,7 @@
         <tfoot class="table-secondary">
           <tr>
             <th colspan="3" class="text-end fs-5">Total</th>
-            <th class="text-end fs-5">${{ total }}</th>
+            <th class="text-end fs-5">S/ {{ total | number:'1.2-2' }}</th>
             <th></th>
           </tr>
         </tfoot>

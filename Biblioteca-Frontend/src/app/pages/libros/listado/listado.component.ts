@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, signal, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DecimalPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { LibroService } from '../../../services/libro.service';
 import { CarritoService } from '../../../services/carrito.service';
 import { Libro } from '../../../models/libro.model';
@@ -9,64 +9,90 @@ import { Libro } from '../../../models/libro.model';
 @Component({
   selector: 'app-listado',
   standalone: true,
-  imports: [RouterLink, FormsModule, DecimalPipe], // <-- Importar DecimalPipe
+  imports: [RouterLink, FormsModule, CommonModule],
   templateUrl: './listado.component.html',
-  styleUrls: ['./listado.component.css']
+  styleUrls: ['./listado.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ListadoComponent implements OnInit {
-  libros: Libro[] = [];
-  filtroTipo: string = '';
+export class ListadoComponent {
+  private libroService = inject(LibroService);
+  private carritoService = inject(CarritoService);
 
-  constructor(
-    private libroService: LibroService,
-    private carritoService: CarritoService
-  ) {}
+  // 🔥 Señales privadas (solo para uso interno)
+  private librosSignal = signal<Libro[]>([]);
+  private cargandoSignal = signal(false);
+  private paginaSignal = signal(0);
+  private tamanioSignal = signal(12);
+  private totalPaginasSignal = signal(0);
+  private totalElementosSignal = signal(0);
 
-  ngOnInit(): void {
-    this.cargarTodos();
-  }
+  // 🔥 Señales públicas (para usar en el template)
+  filtroSignal = signal(''); // 👈 AHORA ES PÚBLICA
 
-  cargarTodos(): void {
-    this.libroService.listar().subscribe({
-      next: (data) => this.libros = data,
-      error: (err) => console.error('Error al cargar libros:', err)
+  // Exponer como readonly las señales que se usan en el template
+  readonly libros = this.librosSignal.asReadonly();
+  readonly cargando = this.cargandoSignal.asReadonly();
+  readonly totalPaginas = this.totalPaginasSignal.asReadonly();
+  readonly totalElementos = this.totalElementosSignal.asReadonly();
+  readonly paginaActual = this.paginaSignal.asReadonly();
+
+  constructor() {
+    effect(() => {
+      const filtro = this.filtroSignal();
+      const pagina = this.paginaSignal();
+      const tamanio = this.tamanioSignal();
+      this.cargarLibros(filtro, pagina, tamanio);
     });
   }
 
-  aplicarFiltro(): void {
-    if (this.filtroTipo) {
-      this.libroService.listar(this.filtroTipo).subscribe({
-        next: (data) => this.libros = data,
-        error: (err) => console.error('Error al filtrar:', err)
-      });
-    } else {
-      this.cargarTodos();
-    }
-  }
-
-  resetFiltro(): void {
-    this.filtroTipo = '';
-    this.cargarTodos();
-  }
-
-  agregarAlCarrito(id: number, cantidad: number): void {
-    if (!id) return;
-    this.carritoService.agregar(id, cantidad).subscribe({
-      next: () => {
-        alert('✅ Libro agregado al carrito');
+  private cargarLibros(filtro: string, pagina: number, tamanio: number) {
+    this.cargandoSignal.set(true);
+    this.libroService.listarPaginado(pagina, tamanio, filtro).subscribe({
+      next: (response) => {
+        this.librosSignal.set(response.content);
+        this.totalPaginasSignal.set(response.totalPages);
+        this.totalElementosSignal.set(response.totalElements);
+        this.cargandoSignal.set(false);
       },
       error: (err) => {
-        console.error('Error al agregar:', err);
-        alert('❌ Error al agregar el libro');
+        console.error('Error al cargar:', err);
+        this.cargandoSignal.set(false);
       }
     });
   }
 
-  eliminar(id: number): void {
+  cambiarFiltro(tipo: string) {
+    this.filtroSignal.set(tipo);
+    this.paginaSignal.set(0);
+  }
+
+  cambiarPagina(pagina: number) {
+    if (pagina < 0 || pagina >= this.totalPaginasSignal()) return;
+    this.paginaSignal.set(pagina);
+  }
+
+  resetFiltro() {
+    this.filtroSignal.set('');
+    this.paginaSignal.set(0);
+  }
+
+  recargar() {
+    this.cargarLibros(this.filtroSignal(), this.paginaSignal(), this.tamanioSignal());
+  }
+
+  agregarAlCarrito(id: number, cantidad: number = 1) {
+    if (!id) return;
+    this.carritoService.agregar(id, cantidad).subscribe({
+      next: () => alert('✅ Agregado al carrito'),
+      error: (err) => alert('❌ Error al agregar')
+    });
+  }
+
+  eliminar(id: number) {
     if (!id) return;
     if (confirm('¿Eliminar este libro?')) {
       this.libroService.eliminar(id).subscribe({
-        next: () => this.aplicarFiltro(),
+        next: () => this.cargarLibros(this.filtroSignal(), this.paginaSignal(), this.tamanioSignal()),
         error: (err) => console.error('Error al eliminar:', err)
       });
     }

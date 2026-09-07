@@ -1,106 +1,126 @@
 <div class="container py-4">
-  <!-- Cabecera -->
+  <!-- Título -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="fw-bold">
       <i class="fas fa-book-open me-2 text-primary"></i>Catálogo de Libros
     </h2>
     <div>
-      <a routerLink="/libros/nuevo" class="btn btn-primary btn-sm me-2">
-        <i class="fas fa-plus me-1"></i> Agregar
+      <a routerLink="/libros/nuevo" class="btn btn-outline-primary btn-sm me-2">
+        <i class="fas fa-plus"></i> Nuevo
       </a>
-      <button class="btn btn-outline-secondary btn-sm" (click)="cargarTodos()" title="Recargar lista">
+      <button class="btn btn-outline-secondary btn-sm" (click)="recargar()" title="Recargar">
         <i class="fas fa-sync-alt"></i>
       </button>
     </div>
   </div>
 
-  <!-- Filtro con botón -->
+  <!-- Filtro instantáneo -->
   <div class="row mb-4">
-    <div class="col-md-6 col-lg-4">
+    <div class="col-md-5 col-lg-4">
       <div class="input-group">
-        <select class="form-select" [(ngModel)]="filtroTipo" id="filtroTipo">
+        <span class="input-group-text bg-white"><i class="fas fa-filter text-muted"></i></span>
+        <select class="form-select" [ngModel]="filtroSignal()" (ngModelChange)="cambiarFiltro($event)">
           <option value="">Todos los tipos</option>
           <option value="DIGITAL">📱 Digital</option>
           <option value="FISICO">📖 Físico</option>
         </select>
-        <button class="btn btn-primary" type="button" (click)="aplicarFiltro()">
-          <i class="fas fa-filter me-1"></i> Filtrar
-        </button>
+        @if (cargando()) {
+          <span class="input-group-text bg-white">
+            <span class="spinner-border spinner-border-sm text-primary"></span>
+          </span>
+        }
       </div>
-      <small class="text-muted mt-1 d-block">Selecciona un tipo y presiona "Filtrar"</small>
+      <small class="text-muted mt-1">Selecciona un tipo para filtrar instantáneamente</small>
     </div>
   </div>
 
-  <!-- Grid de libros -->
-  <div class="row g-4">
-    @for (libro of libros; track libro.id) {
-      <div class="col-sm-6 col-md-4 col-lg-3">
-        <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
-          <img [src]="libro.portada || 'https://via.placeholder.com/300x400?text=Sin+portada'" 
-               class="card-img-top" alt="Portada" 
-               style="height: 220px; object-fit: cover; background: #f0f0f0;"
-               onerror="this.src='https://via.placeholder.com/300x400?text=Error'">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title text-truncate" title="{{ libro.nombre }}">{{ libro.nombre }}</h5>
-            
-            <!-- Autor -->
-            @if (libro.autor) {
-              <p class="card-text small text-muted mb-1">
-                <i class="fas fa-user-edit me-1"></i>{{ libro.autor }}
-              </p>
-            }
-            
-            <div class="mb-2">
-              <span class="badge rounded-pill bg-{{ libro.tipo === 'DIGITAL' ? 'info' : 'secondary' }} text-white me-1">
-                {{ libro.tipo === 'DIGITAL' ? '📱 Digital' : '📖 Físico' }}
-              </span>
-              <span class="badge bg-light text-dark border">{{ libro.editorial || 'Sin editorial' }}</span>
-            </div>
-            
-            <!-- Precio en S/ -->
-            <p class="card-text fs-5 fw-bold text-primary mb-1">
-              S/ {{ libro.precio | number:'1.2-2' }}
-            </p>
-            
-            <p class="card-text small">
-              <span class="text-muted">Stock:</span>
-              @if (libro.stock > 0) {
-                <span class="text-success"><i class="fas fa-check-circle me-1"></i>{{ libro.stock }}</span>
-              } @else {
-                <span class="text-danger"><i class="fas fa-times-circle me-1"></i>Agotado</span>
+  <!-- Grid -->
+  @if (cargando() && libros().length === 0) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
+      <p class="mt-3 text-muted">Cargando libros...</p>
+    </div>
+  } @else {
+    <div class="row g-4">
+      @for (libro of libros(); track libro.id) {
+        <div class="col-sm-6 col-md-4 col-lg-3">
+          <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+            <img [src]="libro.portada || 'https://via.placeholder.com/300x400?text=Sin+portada'" 
+                 class="card-img-top" alt="Portada" 
+                 style="height: 200px; object-fit: cover; background: #f8f9fa;"
+                 onerror="this.src='https://via.placeholder.com/300x400?text=Error'">
+            <div class="card-body d-flex flex-column p-3">
+              <h5 class="card-title fw-semibold text-truncate" title="{{ libro.nombre }}">{{ libro.nombre }}</h5>
+              @if (libro.autor) {
+                <p class="card-text small text-muted mb-1">
+                  <i class="fas fa-user-edit me-1"></i>{{ libro.autor }}
+                </p>
               }
-            </p>
-            
-            <div class="mt-auto">
-              <form (ngSubmit)="agregarAlCarrito(libro.id, +cantidad.value)" class="d-flex gap-1 mb-2">
-                <input #cantidad type="number" value="1" min="1" [max]="libro.stock" 
-                       class="form-control form-control-sm" style="width:60px;" 
-                       [disabled]="libro.stock === 0">
-                <button type="submit" class="btn btn-success btn-sm flex-grow-1" [disabled]="libro.stock === 0">
-                  <i class="fas fa-cart-plus me-1"></i> Agregar
-                </button>
-              </form>
-              <div class="d-flex gap-1">
-                <a [routerLink]="['/libros', libro.id]" class="btn btn-outline-primary btn-sm flex-grow-1">
-                  <i class="fas fa-eye me-1"></i> Ver
-                </a>
-                <a [routerLink]="['/libros/editar', libro.id]" class="btn btn-outline-warning btn-sm">
-                  <i class="fas fa-edit"></i>
-                </a>
-                <button (click)="eliminar(libro.id)" class="btn btn-outline-danger btn-sm" title="Eliminar">
-                  <i class="fas fa-trash-alt"></i>
-                </button>
+              <div class="mb-2">
+                <span class="badge rounded-pill bg-{{ libro.tipo === 'DIGITAL' ? 'info' : 'secondary' }} text-white me-1">
+                  {{ libro.tipo === 'DIGITAL' ? '📱 Digital' : '📖 Físico' }}
+                </span>
+                <span class="badge bg-light text-dark border">{{ libro.editorial || 'Sin editorial' }}</span>
+              </div>
+              <p class="card-text fs-5 fw-bold text-primary mb-1">
+                S/ {{ libro.precio | number:'1.2-2' }}
+              </p>
+              <p class="card-text small mb-2">
+                <span class="text-muted">Stock:</span>
+                @if (libro.stock > 0) {
+                  <span class="text-success"><i class="fas fa-check-circle me-1"></i>{{ libro.stock }}</span>
+                } @else {
+                  <span class="text-danger"><i class="fas fa-times-circle me-1"></i>Agotado</span>
+                }
+              </p>
+              <div class="mt-auto">
+                <div class="d-flex gap-1">
+                  <button class="btn btn-success btn-sm flex-grow-1" 
+                          (click)="agregarAlCarrito(libro.id, 1)" 
+                          [disabled]="libro.stock === 0"
+                          title="Agregar al carrito">
+                    <i class="fas fa-cart-plus"></i>
+                  </button>
+                  <a [routerLink]="['/libros', libro.id]" class="btn btn-outline-primary btn-sm" title="Ver">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  <a [routerLink]="['/libros/editar', libro.id]" class="btn btn-outline-warning btn-sm" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <button (click)="eliminar(libro.id)" class="btn btn-outline-danger btn-sm" title="Eliminar">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    } @empty {
-      <div class="col-12 text-center py-5">
-        <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
-        <p class="text-muted fs-5">No se encontraron libros con el filtro seleccionado.</p>
-        <button class="btn btn-primary" (click)="resetFiltro()">Mostrar todos</button>
-      </div>
+      } @empty {
+        <div class="col-12 text-center py-5">
+          <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+          <p class="text-muted fs-5">No hay libros con el filtro seleccionado.</p>
+          <button class="btn btn-primary" (click)="resetFiltro()">Mostrar todos</button>
+        </div>
+      }
+    </div>
+
+    <!-- Paginación -->
+    @if (totalPaginas() > 1) {
+      <nav class="mt-4" aria-label="Paginación">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" [class.disabled]="paginaActual() === 0">
+            <a class="page-link" (click)="cambiarPagina(paginaActual() - 1)">Anterior</a>
+          </li>
+          @for (pagina of [].constructor(totalPaginas()); track $index) {
+            <li class="page-item" [class.active]="paginaActual() === $index">
+              <a class="page-link" (click)="cambiarPagina($index)">{{ $index + 1 }}</a>
+            </li>
+          }
+          <li class="page-item" [class.disabled]="paginaActual() === totalPaginas() - 1">
+            <a class="page-link" (click)="cambiarPagina(paginaActual() + 1)">Siguiente</a>
+          </li>
+        </ul>
+      </nav>
     }
-  </div>
+  }
 </div>

@@ -1,10 +1,12 @@
-// checkout.component.ts
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { BoletaService } from '../../services/boleta.service';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-checkout',
+  standalone: true,
+  imports: [RouterLink],
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.css']
 })

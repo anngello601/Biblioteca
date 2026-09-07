@@ -1,11 +1,9 @@
-// services/carrito.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Libro } from '../models/libro.model';
 
 export interface CarritoResponse {
-  items: { [key: string]: number }; // libroId -> cantidad
+  items: { [key: string]: number };
   total: number;
   cantidadTotal: number;
 }

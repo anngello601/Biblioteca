@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { CarritoService, CarritoResponse } from '../../services/carrito.service';
 import { LibroService } from '../../services/libro.service';
 import { Libro } from '../../models/libro.model';
@@ -7,7 +8,7 @@ import { Libro } from '../../models/libro.model';
 @Component({
   selector: 'app-carrito',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, CommonModule],
   templateUrl: './carrito.component.html',
   styleUrls: ['./carrito.component.css']
 })

@@ -2,13 +2,16 @@ package com.example.Biblioteca.controller;
 
 import com.example.Biblioteca.entity.Libro;
 import com.example.Biblioteca.service.LibroService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/libros")
-@CrossOrigin(origins = "http://localhost:4200") // Permitir peticiones desde Angular
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class LibroRestController {
 
     private final LibroService libroService;
@@ -18,11 +21,19 @@ public class LibroRestController {
     }
 
     @GetMapping
-    public List<Libro> listar(@RequestParam(required = false) String tipo) {
+    @SuppressWarnings("springdata") // 🔥 Suprime la advertencia de referencia no type-safe
+    public Page<Libro> listarPaginado(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(required = false) String tipo) {
+        
+        // Orden ascendente por nombre (usando Direction, pero sigue siendo un string)
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "nombre"));
+        
         if (tipo != null && !tipo.isEmpty()) {
-            return libroService.listarPorTipo(tipo);
+            return libroService.listarPorTipo(tipo, pageable);
         }
-        return libroService.listarTodos();
+        return libroService.listarTodos(pageable);
     }
 
     @GetMapping("/{id}")

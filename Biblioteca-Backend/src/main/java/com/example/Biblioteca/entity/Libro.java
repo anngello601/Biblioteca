@@ -24,6 +24,6 @@ public class Libro {
     @Column(length = 500)
     private String portada;
 
-    @Column(length = 255)  // Nuevo campo
-    private String autor;        // 👈 AÑADIR ESTE CAMPO
+    @Column(length = 255)
+    private String autor;
 }

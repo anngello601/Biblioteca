@@ -7,5 +7,5 @@ export interface Libro {
   precio: number;
   stock: number;
   portada?: string;
-  autor?: string;   // 👈 AÑADIR ESTE CAMPO
+  autor?: string;
 }

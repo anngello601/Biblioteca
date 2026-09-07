@@ -1,8 +1,8 @@
-// services/libro.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Libro } from '../models/libro.model';
+import { PageResponse } from '../models/page-response.model';
 
 @Injectable({ providedIn: 'root' })
 export class LibroService {
@@ -10,9 +10,16 @@ export class LibroService {
 
   constructor(private http: HttpClient) {}
 
-  listar(tipo?: string): Observable<Libro[]> {
-    const params = tipo ? `?tipo=${tipo}` : '';
-    return this.http.get<Libro[]>(`${this.apiUrl}${params}`, { withCredentials: true });
+  listarPaginado(page: number = 0, size: number = 12, tipo?: string): Observable<PageResponse<Libro>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+    
+    if (tipo) {
+      params = params.set('tipo', tipo);
+    }
+    
+    return this.http.get<PageResponse<Libro>>(this.apiUrl, { params, withCredentials: true });
   }
 
   obtener(id: number): Observable<Libro> {

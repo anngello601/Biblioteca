@@ -1,8 +1,7 @@
-// services/boleta.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Boleta } from '../models/boleta.model'; // crear este modelo
+import { Boleta } from '../models/boleta.model';
 
 @Injectable({ providedIn: 'root' })
 export class BoletaService {
