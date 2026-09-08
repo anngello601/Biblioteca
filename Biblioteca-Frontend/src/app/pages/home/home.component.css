@@ -1,0 +1,38 @@
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+}
+
+/* Utilidades de transición */
+.hover-shadow {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.hover-shadow:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.12) !important;
+}
+
+.transition {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Tipografía Playfair */
+.font-serif {
+  font-family: 'Playfair Display', serif;
+}
+
+/* Min-height para hero */
+.min-vh-75 {
+  min-height: 75vh;
+}
+@media (max-width: 768px) {
+  .min-vh-75 {
+    min-height: auto;
+  }
+  .hero-section {
+    padding: 4rem 0;
+  }
+}

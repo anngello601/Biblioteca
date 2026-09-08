@@ -1,0 +1,238 @@
+<!-- ============================================
+     NOVABOOK - Página de Inicio
+     Basado en el diseño de Stitch
+     ============================================ -->
+
+<!-- HERO SECTION -->
+<section class="hero-section position-relative overflow-hidden">
+  <div class="container py-5">
+    <div class="row align-items-center min-vh-75">
+      <div class="col-lg-7 z-2">
+        <div class="d-inline-flex align-items-center gap-2 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-pill mb-4">
+          <i class="fas fa-book-open text-warning"></i>
+          <span class="small text-uppercase fw-semibold text-muted">Santuario de Lectores • Físico &amp; Digital</span>
+        </div>
+        <h1 class="display-3 fw-bold font-serif lh-1 mb-4">
+          Historias que cobran vida en <span class="text-warning fst-italic">papel</span> o en tu <span
+            class="fst-italic">pantalla</span>
+        </h1>
+        <p class="lead text-muted mb-4">
+          Ediciones primorosas de tapa dura y bolsillo con envíos protegidos a todo el país, complementadas con lectura
+          instantánea ePub y Kindle lista en tu biblioteca.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          <a routerLink="/libros" class="btn btn-dark btn-lg px-4 py-3 rounded-pill">
+            <i class="fas fa-arrow-right me-2"></i>Explorar Catálogo
+          </a>
+          <a routerLink="/libros?tipo=DIGITAL" class="btn btn-outline-secondary btn-lg px-4 py-3 rounded-pill">
+            <i class="fas fa-tablet-alt me-2"></i>Ver Digitales
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-block">
+        <div class="position-relative">
+          <img
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmP2l23UknEWtyYCnyUWHE85jAa8AglbfNL2gtzQ64co6DN9k401hN6Jcjh9ft6rIXmMtnD14tBCDMjJ073REs73aZnDbsJLLelV_F7fcFvbudo8gqNQ7dFFVnnxShlnWlSewgGSIGpxXrUtaVCIL4Zk8QdC08iHxOwL0Ehfnx3elUHxY7EUAYwRj-5DbupAzo4sYFwzbIY3GvA2lJz0nG701MIoRBd30y1CWrOaSoExZTatKuQQ6Y"
+            alt="Libro destacado" class="img-fluid rounded-3 shadow-lg">
+          <div class="position-absolute bottom-0 end-0 bg-white rounded-3 shadow-lg p-3"
+            style="transform: translate(20%, 20%);">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fas fa-cloud-download-alt text-warning fa-2x"></i>
+              <div>
+                <small class="text-uppercase text-muted d-block">Sync Digital</small>
+                <strong>Página 184 de 420</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRIPLE VALOR -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="d-flex gap-3 p-4 bg-white rounded-3 shadow-sm h-100">
+          <i class="fas fa-box fa-2x text-primary"></i>
+          <div>
+            <h5 class="fw-bold">Envíos Protegidos</h5>
+            <p class="text-muted small">Embalaje reforzado 100% reciclable con solapas antigolpes. Rastreo punto a punto
+              directo a tu biblioteca en 24-48 horas.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="d-flex gap-3 p-4 bg-white rounded-3 shadow-sm h-100">
+          <i class="fas fa-tablet-alt fa-2x text-warning"></i>
+          <div>
+            <h5 class="fw-bold">Lectura Inmediata</h5>
+            <p class="text-muted small">Descarga ePub, Kindle y PDF protegido sin esperas. Lee en tu app habitual,
+              tableta o e-reader con sincronización perpetua.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="d-flex gap-3 p-4 bg-white rounded-3 shadow-sm h-100">
+          <i class="fas fa-users fa-2x text-success"></i>
+          <div>
+            <h5 class="fw-bold">Club NovaBook</h5>
+            <p class="text-muted small">Acceso a debates literarios con autores, pre-ventas firmadas y un 15% de crédito
+              acumulable en cada pedido.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIBROS DESTACADOS -->
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <span class="badge bg-warning text-dark text-uppercase small fw-bold px-3 py-2">Top Ventas Editoriales</span>
+        <h2 class="fw-bold font-serif mt-2">Los Más Vendidos de la Temporada</h2>
+        <p class="text-muted">Obras aclamadas por la crítica y devoradas por nuestra comunidad de lectores.</p>
+      </div>
+      <a routerLink="/libros" class="btn btn-outline-secondary rounded-pill px-4">
+        Ver todos <i class="fas fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    @if (cargando) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+    } @else {
+    <div class="row g-4">
+      @for (libro of librosDestacados; track libro.id) {
+      <div class="col-sm-6 col-md-4 col-lg-3">
+        <div class="card h-100 border-0 shadow-sm hover-shadow transition rounded-3 overflow-hidden">
+          <img [src]="libro.portada || 'https://via.placeholder.com/300x400?text=Sin+portada'" class="card-img-top"
+            alt="Portada de {{ libro.nombre }}" style="height: 220px; object-fit: cover;"
+            onerror="this.src='https://via.placeholder.com/300x400?text=Error'">
+          <div class="card-body d-flex flex-column">
+            <span class="badge bg-secondary rounded-pill mb-2 align-self-start">{{ libro.tipo }}</span>
+            <h5 class="card-title text-truncate">{{ libro.nombre }}</h5>
+            <p class="card-text small text-muted">{{ libro.autor || 'Autor desconocido' }}</p>
+            <p class="card-text fw-bold text-primary mb-2">S/ {{ libro.precio | number:'1.2-2' }}</p>
+            <p class="card-text small">
+              @if (libro.stock > 0) {
+              <span class="text-success"><i class="fas fa-check-circle"></i> Disponible</span>
+              } @else {
+              <span class="text-danger"><i class="fas fa-times-circle"></i> Sin stock</span>
+              }
+            </p>
+            <div class="mt-auto d-flex gap-1">
+              <button class="btn btn-success btn-sm flex-grow-1" (click)="agregarAlCarrito(libro.id)"
+                [disabled]="libro.stock === 0">
+                <i class="fas fa-cart-plus me-1"></i> Agregar
+              </button>
+              <a [routerLink]="['/libros', libro.id]" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-eye"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      } @empty {
+      <div class="col-12 text-center py-5">
+        <p class="text-muted">No hay libros disponibles.</p>
+      </div>
+      }
+    </div>
+    }
+  </div>
+</section>
+
+<!-- CATEGORÍAS (GÉNEROS) -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="fw-bold font-serif text-center mb-4">Explora por Géneros</h2>
+    <div class="row g-3 justify-content-center">
+      <div class="col-6 col-md-2">
+        <a routerLink="/libros"
+          class="d-block text-center p-3 bg-white rounded-3 shadow-sm text-decoration-none text-dark hover-shadow transition">
+          <i class="fas fa-pen-fancy fa-2x text-primary mb-2 d-block"></i>
+          <span class="fw-semibold">Ficción</span>
+        </a>
+      </div>
+      <div class="col-6 col-md-2">
+        <a routerLink="/libros"
+          class="d-block text-center p-3 bg-white rounded-3 shadow-sm text-decoration-none text-dark hover-shadow transition">
+          <i class="fas fa-scroll fa-2x text-warning mb-2 d-block"></i>
+          <span class="fw-semibold">No Ficción</span>
+        </a>
+      </div>
+      <div class="col-6 col-md-2">
+        <a routerLink="/libros"
+          class="d-block text-center p-3 bg-white rounded-3 shadow-sm text-decoration-none text-dark hover-shadow transition">
+          <i class="fas fa-rocket fa-2x text-success mb-2 d-block"></i>
+          <span class="fw-semibold">Ciencia Ficción</span>
+        </a>
+      </div>
+      <div class="col-6 col-md-2">
+        <a routerLink="/libros"
+          class="d-block text-center p-3 bg-white rounded-3 shadow-sm text-decoration-none text-dark hover-shadow transition">
+          <i class="fas fa-brain fa-2x text-info mb-2 d-block"></i>
+          <span class="fw-semibold">Desarrollo Personal</span>
+        </a>
+      </div>
+      <div class="col-6 col-md-2">
+        <a routerLink="/libros"
+          class="d-block text-center p-3 bg-white rounded-3 shadow-sm text-decoration-none text-dark hover-shadow transition">
+          <i class="fas fa-child fa-2x text-danger mb-2 d-block"></i>
+          <span class="fw-semibold">Infantil</span>
+        </a>
+      </div>
+      <div class="col-6 col-md-2">
+        <a routerLink="/libros"
+          class="d-block text-center p-3 bg-white rounded-3 shadow-sm text-decoration-none text-dark hover-shadow transition">
+          <i class="fas fa-star fa-2x text-warning mb-2 d-block"></i>
+          <span class="fw-semibold">Novedades</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="py-5 bg-dark text-white">
+  <div class="container text-center">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="d-inline-flex align-items-center gap-2 bg-warning text-dark px-3 py-1 rounded-pill mb-3">
+          <i class="fas fa-gift"></i>
+          <span class="small text-uppercase fw-bold">Bienvenida a la Comunidad</span>
+        </div>
+        <h2 class="fw-bold font-serif mb-3">
+          Únete al Círculo Editorial y recibe un <span class="text-warning">15% de descuento</span> en tu primera compra
+        </h2>
+        <p class="text-light opacity-75 mb-4">
+          Sin spam de ofertas masivas. Solo un boletín dominical con crónicas de lectura, anticipos de primeras
+          ediciones y recomendaciones firmadas por nuestros libreros.
+        </p>
+        <form class="row g-2 justify-content-center" (submit)="suscribirNewsletter()">
+          <div class="col-12 col-sm-8 col-md-6">
+            <input type="email" class="form-control form-control-lg rounded-pill"
+              placeholder="Tu correo electrónico de lector..." required>
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-warning btn-lg rounded-pill px-5 fw-bold">
+              Obtener 15%
+            </button>
+          </div>
+        </form>
+        <div class="mt-3 d-flex justify-content-center gap-4 small text-light opacity-75">
+          <span><i class="fas fa-lock me-1"></i> Sin compromisos</span>
+          <span><i class="fas fa-check-circle me-1"></i> Válido para libros físicos y eBooks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

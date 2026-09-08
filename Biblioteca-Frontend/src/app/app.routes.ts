@@ -7,6 +7,7 @@ import { CarritoComponent } from './pages/carrito/carrito.component';
 import { CheckoutComponent } from './pages/checkout/checkout.component';
 import { ExitoComponent } from './pages/exito/exito.component';
 import { AuthGuard } from './guards/auth.guard';
+import { HomeComponent } from './pages/home/home.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/libros', pathMatch: 'full' },
@@ -17,5 +18,6 @@ export const routes: Routes = [
   { path: 'carrito', component: CarritoComponent, canActivate: [AuthGuard] },
   { path: 'checkout', component: CheckoutComponent, canActivate: [AuthGuard] },
   { path: 'exito', component: ExitoComponent, canActivate: [AuthGuard] },
+  { path: 'home', component: HomeComponent },
   { path: '**', redirectTo: '/libros' }
 ];
