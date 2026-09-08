@@ -11,7 +11,7 @@ import { AuthService } from './services/auth.service';
     <app-navbar></app-navbar>
     <router-outlet></router-outlet>
   `,
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.css']
 })
 export class AppComponent implements OnInit {
   private authService = inject(AuthService);

@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';  // 👈 Importa RouterLinkActive
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
@@ -9,7 +9,7 @@ import { Usuario } from '../../models/usuario.model';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, RouterLinkActive],  // 👈 Añade RouterLinkActive aquí
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
