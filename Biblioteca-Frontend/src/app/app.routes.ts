@@ -13,7 +13,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'registro', component: RegistroComponent },
   { path: 'libros', component: ListadoComponent },
-  { path: 'libros/:id', component: DetalleComponent },
+  { path: 'libros/:id', component: DetalleComponent }, 
   { path: 'carrito', component: CarritoComponent, canActivate: [AuthGuard] },
   { path: 'checkout', component: CheckoutComponent, canActivate: [AuthGuard] },
   { path: 'exito', component: ExitoComponent, canActivate: [AuthGuard] },

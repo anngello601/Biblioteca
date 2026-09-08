@@ -1,126 +1,41 @@
-/* Navbar moderna con gradiente */
 .navbar {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  padding: 12px 0;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+  padding: 0.25rem 0;
 }
-
 .navbar-brand {
-  font-size: 1.5rem;
-  letter-spacing: -0.5px;
-  color: #fff !important;
+  font-size: 1.25rem;
 }
-
-.navbar-brand i {
-  color: #60a5fa;
-}
-
 .navbar .nav-link {
-  color: rgba(255, 255, 255, 0.8) !important;
   font-weight: 500;
-  padding: 8px 16px !important;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  color: #45464d;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  transition: background 0.15s, color 0.15s;
 }
-
-.navbar .nav-link:hover {
-  color: #fff !important;
-  background: rgba(255, 255, 255, 0.1);
-}
-
+.navbar .nav-link:hover,
 .navbar .nav-link.active {
-  color: #fff !important;
-  background: rgba(255, 255, 255, 0.15);
+  background: #f3f4f5;
+  color: #0f172a;
 }
-
-/* Botones de login/registro */
-.btn-nav {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 8px !important;
-  padding: 8px 18px !important;
-  transition: all 0.2s ease;
-}
-
-.btn-nav:hover {
-  background: rgba(255, 255, 255, 0.18) !important;
-}
-
-.btn-register {
-  background: #3b82f6 !important;
-  color: #fff !important;
-  border-radius: 8px !important;
-  padding: 8px 18px !important;
-}
-
-.btn-register:hover {
-  background: #2563eb !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-}
-
-/* Dropdown del usuario */
-.dropdown-menu {
-  border-radius: 12px;
-  padding: 8px;
-  min-width: 200px;
-  background: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.dropdown-menu .dropdown-item {
-  color: rgba(255, 255, 255, 0.8);
-  border-radius: 8px;
-  padding: 8px 16px;
-  transition: all 0.2s;
-}
-
-.dropdown-menu .dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-}
-
-.dropdown-menu .dropdown-item.text-danger:hover {
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-}
-
-.dropdown-item-text {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.dropdown-divider {
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-/* Badge carrito */
-.badge-carrito {
-  background: #f59e0b;
-  color: #1e293b;
+.navbar .nav-link.active {
   font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 20px;
-  font-size: 0.7rem;
-  margin-left: 4px;
 }
-
-/* Fix para que el dropdown no se cierre al hacer clic en el nombre */
-.dropdown-toggle::after {
-  margin-left: 6px;
+.dropdown-menu {
+  border: none;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  border-radius: 0.75rem;
+  padding: 0.5rem;
+}
+.dropdown-item {
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.75rem;
+}
+.dropdown-item:hover {
+  background: #f3f4f5;
+}
+.material-symbols-outlined {
+  font-size: 1.5rem;
   vertical-align: middle;
-}
-
-/* Responsive */
-@media (max-width: 991px) {
-  .navbar .nav-link {
-    padding: 10px 16px !important;
-  }
-  .btn-nav, .btn-register {
-    margin: 4px 0;
-    text-align: center;
-  }
-  .dropdown-menu {
-    background: #0f172a;
-  }
 }

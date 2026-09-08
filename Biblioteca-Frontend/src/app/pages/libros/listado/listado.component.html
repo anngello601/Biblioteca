@@ -1,135 +1,193 @@
+<!-- Wrapper principal -->
 <div class="container py-4">
-  <!-- Título -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold">
-      <i class="fas fa-book-open me-2 text-primary"></i>Catálogo de Libros
-    </h2>
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb bg-transparent p-0 m-0">
+      <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none">Inicio</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Catálogo General</li>
+    </ol>
+  </nav>
+
+  <!-- Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
     <div>
-      <a routerLink="/libros/nuevo" class="btn btn-outline-primary btn-sm me-2">
-        <i class="fas fa-plus"></i> Nuevo
-      </a>
-      <button class="btn btn-outline-secondary btn-sm" (click)="recargar()" title="Recargar">
-        <i class="fas fa-sync-alt"></i>
-      </button>
+      <h1 class="display-6 fw-bold font-serif">Catálogo Completo de Libros</h1>
+      <p class="text-muted">Explora nuestra colección selecta de tomos impresos y ediciones digitales.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-light text-dark border p-2">
+        <i class="fas fa-book-open me-1"></i> {{ libros().length }} títulos
+      </span>
     </div>
   </div>
 
-  <!-- Filtro instantáneo -->
-  <div class="row mb-4">
-    <div class="col-md-5 col-lg-4">
-      <div class="input-group">
-        <span class="input-group-text bg-white"><i class="fas fa-filter text-muted"></i></span>
-        <select class="form-select" [ngModel]="filtroSignal()" (ngModelChange)="cambiarFiltro($event)">
-          <option value="">Todos los tipos</option>
-          <option value="DIGITAL">📱 Digital</option>
-          <option value="FISICO">📖 Físico</option>
-        </select>
-        @if (cargando()) {
-          <span class="input-group-text bg-white">
-            <span class="spinner-border spinner-border-sm text-primary"></span>
-          </span>
-        }
+  <!-- Barra de filtros superiores -->
+  <div class="bg-white rounded-3 p-3 shadow-sm mb-4 d-flex flex-wrap justify-content-between align-items-center">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <span class="fw-semibold text-muted small">Filtros:</span>
+      <!-- 🔥 COMBO de filtro (vinculado a la señal) -->
+      <select class="form-select form-select-sm w-auto border-0 bg-light" [ngModel]="filtroTipo()"
+        (ngModelChange)="cambiarFiltro($event)">
+        <option value="">Todos los formatos</option>
+        <option value="FISICO">📖 Físico</option>
+        <option value="DIGITAL">💻 Digital</option>
+      </select>
+      <button class="btn btn-link text-secondary p-0 small" (click)="resetFiltros()">Limpiar todo</button>
+    </div>
+    <div class="d-flex gap-2 align-items-center">
+      <label for="sortSelect" class="text-muted small me-1">Ordenar por:</label>
+      <select id="sortSelect" class="form-select form-select-sm w-auto border-0 bg-light">
+        <option>Más vendidos</option>
+        <option>Menor precio</option>
+        <option>Mayor precio</option>
+        <option>Novedades</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Grid principal -->
+  <div class="row g-4">
+    <!-- Sidebar de filtros -->
+    <aside class="col-lg-3">
+      <div class="filter-sidebar">
+        <div class="d-flex justify-content-between align-items-center pb-2 border-bottom mb-3">
+          <h5 class="font-serif fw-bold m-0"><i class="fas fa-sliders-h me-2"></i>Refinar</h5>
+          <button class="btn btn-link text-secondary p-0 small" (click)="resetFiltros()">Restablecer</button>
+        </div>
+
+        <!-- Formato (estático) -->
+        <div class="filter-section">
+          <h3>Formato</h3>
+          <div class="d-flex flex-column gap-1">
+            <label class="d-flex justify-content-between align-items-center">
+              <span><input type="radio" name="tipoRadio" [checked]="filtroTipo() === ''" (change)="cambiarFiltro('')">
+                Todos</span>
+              <span class="count">{{ librosOriginales().length }}</span>
+            </label>
+            <label class="d-flex justify-content-between align-items-center">
+              <span><input type="radio" name="tipoRadio" [checked]="filtroTipo() === 'FISICO'"
+                  (change)="cambiarFiltro('FISICO')"> Físico</span>
+              <span class="count">{{ librosOriginales().filter(l => l.tipo === 'FISICO').length }}</span>
+            </label>
+            <label class="d-flex justify-content-between align-items-center">
+              <span><input type="radio" name="tipoRadio" [checked]="filtroTipo() === 'DIGITAL'"
+                  (change)="cambiarFiltro('DIGITAL')"> Digital</span>
+              <span class="count">{{ librosOriginales().filter(l => l.tipo === 'DIGITAL').length }}</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Rango de precio -->
+        <div class="filter-section">
+          <h3>Rango de Precio (S/)</h3>
+          <div class="d-flex gap-2">
+            <input type="number" class="form-control form-control-sm" placeholder="Mín" [(ngModel)]="precioMin"
+              step="0.01">
+            <span class="align-self-center">-</span>
+            <input type="number" class="form-control form-control-sm" placeholder="Máx" [(ngModel)]="precioMax"
+              step="0.01">
+          </div>
+          <button class="btn btn-secondary-custom btn-sm w-100 mt-2" (click)="aplicarFiltroPrecio()">Aplicar</button>
+        </div>
+
+        <!-- Editoriales (dinámico) -->
+        <div class="filter-section">
+          <h3>Editorial</h3>
+          @for (editorial of editoriales(); track editorial) {
+          <label class="d-flex justify-content-between align-items-center">
+            <span>
+              <input type="checkbox" class="form-check-input me-2"
+                [checked]="editorialesSeleccionadas().includes(editorial)" (change)="toggleEditorial(editorial)">
+              {{ editorial }}
+            </span>
+            <span class="count">{{ librosOriginales().filter(l => l.editorial === editorial).length }}</span>
+          </label>
+          }
+        </div>
+
+        <!-- Callout -->
+        <div class="bg-dark text-white p-3 rounded-3 mt-3">
+          <p class="small"><i class="fas fa-book-open me-2"></i> Servicio NovaCurator</p>
+          <p class="small">¿Buscas una recomendación a la medida?</p>
+          <button class="btn btn-light btn-sm w-100">Hablar con un Librero</button>
+        </div>
       </div>
-      <small class="text-muted mt-1">Selecciona un tipo para filtrar instantáneamente</small>
-    </div>
-  </div>
+    </aside>
 
-  <!-- Grid de libros -->
-  @if (cargando() && libros().length === 0) {
-    <div class="text-center py-5">
-      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
-      <p class="mt-3 text-muted">Cargando libros...</p>
-    </div>
-  } @else {
-    <div class="row g-4">
-      @for (libro of libros(); track libro.id) {
-        <div class="col-sm-6 col-md-4 col-lg-3">
-          <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
-            <!-- Portada -->
-            <img [src]="libro.portada || 'https://via.placeholder.com/300x400?text=Sin+portada'" 
-                 class="card-img-top" alt="Portada" 
-                 style="height: 200px; object-fit: cover; background: #f8f9fa;"
-                 onerror="this.src='https://via.placeholder.com/300x400?text=Error'">
-            <div class="card-body d-flex flex-column p-3">
-              <h5 class="card-title fw-semibold text-truncate" title="{{ libro.nombre }}">{{ libro.nombre }}</h5>
-              @if (libro.autor) {
-                <p class="card-text small text-muted mb-1">
-                  <i class="fas fa-user-edit me-1"></i>{{ libro.autor }}
-                </p>
-              }
-              <div class="mb-2">
-                <span class="badge rounded-pill bg-{{ libro.tipo === 'DIGITAL' ? 'info' : 'secondary' }} text-white me-1">
-                  {{ libro.tipo === 'DIGITAL' ? '📱 Digital' : '📖 Físico' }}
-                </span>
-                <span class="badge bg-light text-dark border">{{ libro.editorial || 'Sin editorial' }}</span>
-              </div>
-              <p class="card-text fs-5 fw-bold text-primary mb-1">
-                S/ {{ libro.precio | number:'1.2-2' }}
-              </p>
-              <p class="card-text small mb-2">
-                <span class="text-muted">Stock:</span>
+    <!-- Grid de libros -->
+    <section class="col-lg-9">
+      @if (cargando()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-2 text-muted">Cargando libros...</p>
+      </div>
+      } @else {
+      <div class="row g-4">
+        @for (libro of libros(); track libro.id) {
+        <div class="col-sm-6 col-md-4 col-xl-3">
+          <div class="book-card">
+            <img [src]="libro.portada || 'https://via.placeholder.com/300x400?text=Sin+portada'" class="card-img-top"
+              alt="Portada de {{ libro.nombre }}" onerror="this.src='https://via.placeholder.com/300x400?text=Error'">
+            <div class="card-body">
+              <!-- Badge con colores diferenciados -->
+              <span class="badge rounded-pill mb-1" [class.bg-primary]="libro.tipo === 'FISICO'"
+                [class.bg-success]="libro.tipo === 'DIGITAL'"
+                [class.bg-secondary]="libro.tipo !== 'FISICO' && libro.tipo !== 'DIGITAL'">
+                {{ libro.tipo === 'FISICO' ? '📖 Físico' : libro.tipo === 'DIGITAL' ? '💻 Digital' : libro.tipo }}
+              </span>
+              <h5 class="card-title">{{ libro.nombre }}</h5>
+              <p class="card-author"><i class="fas fa-user-edit me-1"></i> {{ libro.autor || 'Autor desconocido' }}</p>
+              <p class="precio">S/ {{ libro.precio | number:'1.2-2' }}</p>
+              <p class="stock-badge">
                 @if (libro.stock > 0) {
-                  <span class="text-success"><i class="fas fa-check-circle me-1"></i>{{ libro.stock }}</span>
+                <span class="text-success"><i class="fas fa-check-circle me-1"></i> Disponible ({{ libro.stock
+                  }})</span>
                 } @else {
-                  <span class="text-danger"><i class="fas fa-times-circle me-1"></i>Agotado</span>
+                <span class="text-danger"><i class="fas fa-times-circle me-1"></i> Sin stock</span>
                 }
               </p>
-              <div class="mt-auto">
-                <div class="d-flex gap-1">
-                  <!-- 🔥 Botón AGREGAR (sin formulario) -->
-                  <button class="btn btn-success btn-sm flex-grow-1" 
-                          (click)="agregarAlCarrito(libro.id, 1)" 
-                          [disabled]="libro.stock === 0 || agregandoSignal()"
-                          title="Agregar al carrito">
-                    @if (agregandoSignal()) {
-                      <span class="spinner-border spinner-border-sm" role="status"></span>
-                    } @else {
-                      <i class="fas fa-cart-plus"></i> Agregar
-                    }
-                  </button>
-                  <!-- Ver detalle -->
-                  <a [routerLink]="['/libros', libro.id]" class="btn btn-outline-primary btn-sm" title="Ver detalle">
-                    <i class="fas fa-eye"></i>
-                  </a>
-                  <!-- Editar -->
-                  <a [routerLink]="['/libros/editar', libro.id]" class="btn btn-outline-warning btn-sm" title="Editar">
-                    <i class="fas fa-edit"></i>
-                  </a>
-                  <!-- Eliminar -->
-                  <button (click)="eliminar(libro.id)" class="btn btn-outline-danger btn-sm" title="Eliminar">
-                    <i class="fas fa-trash-alt"></i>
-                  </button>
-                </div>
+              <div class="mt-auto d-flex gap-1">
+                <button class="btn btn-success btn-sm flex-grow-1" (click)="agregarAlCarrito(libro.id, 1)"
+                  [disabled]="libro.stock === 0">
+                  <i class="fas fa-cart-plus me-1"></i> Agregar
+                </button>
+                <a [routerLink]="['/libros', 1]" class="btn btn-outline-primary btn-sm">
+                  <i class="fas fa-eye me-1"></i> Ver
+                </a>
               </div>
             </div>
           </div>
         </div>
-      } @empty {
+        } @empty {
         <div class="col-12 text-center py-5">
           <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
-          <p class="text-muted fs-5">No hay libros con el filtro seleccionado.</p>
-          <button class="btn btn-primary" (click)="resetFiltro()">Mostrar todos</button>
+          <p class="text-muted">No hay libros con los filtros seleccionados.</p>
+          <button class="btn btn-primary" (click)="resetFiltros()">Mostrar todos</button>
         </div>
-      }
-    </div>
+        }
+      </div>
 
-    <!-- Paginación -->
-    @if (totalPaginas() > 1) {
-      <nav class="mt-4" aria-label="Paginación">
-        <ul class="pagination justify-content-center">
+      <!-- Paginación (backend) -->
+      @if (totalPaginas() > 1) {
+      <nav class="mt-4 d-flex justify-content-center" aria-label="Paginación">
+        <ul class="pagination pagination-custom">
           <li class="page-item" [class.disabled]="paginaActual() === 0">
             <a class="page-link" (click)="cambiarPagina(paginaActual() - 1)">Anterior</a>
           </li>
-          @for (pagina of [].constructor(totalPaginas()); track $index) {
-            <li class="page-item" [class.active]="paginaActual() === $index">
-              <a class="page-link" (click)="cambiarPagina($index)">{{ $index + 1 }}</a>
-            </li>
+          @for (pag of [].constructor(totalPaginas()); track $index) {
+          <li class="page-item" [class.active]="paginaActual() === $index">
+            <a class="page-link" (click)="cambiarPagina($index)">{{ $index + 1 }}</a>
+          </li>
           }
           <li class="page-item" [class.disabled]="paginaActual() === totalPaginas() - 1">
             <a class="page-link" (click)="cambiarPagina(paginaActual() + 1)">Siguiente</a>
           </li>
         </ul>
       </nav>
-    }
-  }
+      }
+      }
+    </section>
+  </div>
 </div>

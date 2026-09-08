@@ -26,4 +26,7 @@ public class Libro {
 
     @Column(length = 255)
     private String autor;
+
+    @Column(columnDefinition = "TEXT")  // 👈 NUEVO CAMPO
+    private String descripcion;
 }

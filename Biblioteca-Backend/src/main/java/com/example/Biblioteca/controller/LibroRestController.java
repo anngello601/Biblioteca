@@ -26,10 +26,11 @@ public class LibroRestController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(required = false) String tipo) {
-        
-        // Orden ascendente por nombre (usando Direction, pero sigue siendo un string)
+
+        System.out.println("🔍 Filtro recibido en backend: " + tipo);
+
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "nombre"));
-        
+
         if (tipo != null && !tipo.isEmpty()) {
             return libroService.listarPorTipo(tipo, pageable);
         }

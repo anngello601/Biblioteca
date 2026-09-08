@@ -8,7 +8,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([credentialsInterceptor])
+      withInterceptors([credentialsInterceptor]) // 👈 Asegúrate de que esté aquí
     )
   ]
 };

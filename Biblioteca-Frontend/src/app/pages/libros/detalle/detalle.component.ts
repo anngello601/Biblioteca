@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { LibroService } from '../../../services/libro.service';
 import { CarritoService } from '../../../services/carrito.service';
 import { Libro } from '../../../models/libro.model';
@@ -9,7 +9,7 @@ import { Libro } from '../../../models/libro.model';
 @Component({
   selector: 'app-detalle-libro',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './detalle.component.html',
   styleUrls: ['./detalle.component.css']
 })
@@ -24,27 +24,33 @@ export class DetalleComponent implements OnInit {
     private router: Router,
     private libroService: LibroService,
     private carritoService: CarritoService
-  ) {}
+  ) { }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
+    console.log('📄 ID obtenido de la ruta:', id);  // 👈 Ver qué llega
+
     if (id) {
       this.cargarLibro(+id);
     } else {
       this.error = 'ID no válido';
       this.loading = false;
+      console.error('❌ No se encontró ID en la ruta');
     }
   }
 
   cargarLibro(id: number) {
+    console.log('📚 Cargando libro con ID:', id);
     this.loading = true;
     this.libroService.obtener(id).subscribe({
       next: (data) => {
+        console.log('✅ Libro recibido:', data);
         this.libro = data;
         this.loading = false;
       },
       error: (err) => {
-        this.error = 'Error al cargar el libro';
+        console.error('❌ Error al cargar el libro:', err);
+        this.error = 'Error al cargar el libro: ' + (err.error || err.message);
         this.loading = false;
       }
     });

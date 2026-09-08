@@ -27,11 +27,19 @@ export class AuthService {
       .pipe(tap(() => this.usuarioSubject.next(null)));
   }
 
+  // 🔥 Este método siempre hace la petición al backend (incluso si ya hay usuario)
   getUsuarioActual(): Observable<Usuario | null> {
-    if (this.usuarioSubject.value) {
-      return this.usuarioSubject.asObservable();
-    }
     return this.http.get<Usuario>(`${this.apiUrl}/usuario`, { withCredentials: true })
-      .pipe(tap(usuario => this.usuarioSubject.next(usuario)));
+      .pipe(
+        tap({
+          next: (usuario) => this.usuarioSubject.next(usuario),
+          error: (err) => {
+            // Si da error 401, significa que no hay sesión válida
+            if (err.status === 401) {
+              this.usuarioSubject.next(null);
+            }
+          }
+        })
+      );
   }
 }

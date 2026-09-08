@@ -8,17 +8,17 @@ import { PageResponse } from '../models/page-response.model';
 export class LibroService {
   private apiUrl = 'http://localhost:8080/api/libros';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   listarPaginado(page: number = 0, size: number = 12, tipo?: string): Observable<PageResponse<Libro>> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
-    
+
     if (tipo) {
       params = params.set('tipo', tipo);
     }
-    
+
     return this.http.get<PageResponse<Libro>>(this.apiUrl, { params, withCredentials: true });
   }
 

@@ -8,4 +8,5 @@ export interface Libro {
   stock: number;
   portada?: string;
   autor?: string;
+  descripcion?: string;   // 👈 NUEVO CAMPO
 }

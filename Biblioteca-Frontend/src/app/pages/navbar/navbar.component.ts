@@ -23,15 +23,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   ngOnInit() {
-    // Suscribirse al usuario (se actualiza al login/logout)
+    // Suscribirse al observable del usuario
     this.subscriptions.push(
       this.authService.usuario$.subscribe(user => {
         this.usuario = user;
+        console.log('Navbar actualizado con usuario:', user);
       })
     );
 
-    // Obtener sesión actual si existe
-    this.authService.getUsuarioActual().subscribe();
+    // 🔥 Intentar restaurar la sesión al cargar la página
+    this.authService.getUsuarioActual().subscribe({
+      error: (err) => console.error('Error al restaurar sesión:', err)
+    });
 
     // Suscribirse al carrito
     this.subscriptions.push(
