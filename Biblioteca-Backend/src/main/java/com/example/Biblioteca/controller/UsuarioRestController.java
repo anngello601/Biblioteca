@@ -82,6 +82,7 @@ public class UsuarioRestController {
     public ResponseEntity<?> actualizarPerfil(
             @RequestParam("nombre") String nombre,
             @RequestParam(value = "password", required = false) String password,
+            @RequestParam(value = "avatarUrl", required = false) String avatarUrl, // NUEVO
             @RequestPart(value = "avatar", required = false) MultipartFile avatar,
             HttpSession session) {
 

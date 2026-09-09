@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { ChangeDetectorRef } from '@angular/core';
+
 
 @Component({
   selector: 'app-perfil',
@@ -16,11 +18,13 @@ export class PerfilComponent {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef); // 👈 NUEVO
+
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   readonly defaultAvatarUrl = 'https://i.ibb.co/nM8GvScD/pngwing-com.png';
-  
+
   // Estado del formulario
   nombre = '';
   password = '';
@@ -48,10 +52,13 @@ export class PerfilComponent {
             this.modoImagen = 'url';
           }
         }
+        this.cdr.detectChanges();
       },
-      error: () => {
-        this.error = 'No se pudo cargar el perfil. Inicia sesión nuevamente.';
-        this.router.navigate(['/login']);
+      error: (err) => {
+        this.cargando = false;
+        this.error = err.error || 'Error al actualizar el perfil.';
+        this.cdr.detectChanges(); // 👈 TAMBIÉN AQUÍ
+        console.error(err);
       }
     });
   }
@@ -114,58 +121,41 @@ export class PerfilComponent {
     this.mensaje = '';
     this.cargando = true;
 
-    // Construir el objeto a enviar
-    const data: any = {
-      nombre: this.nombre
-    };
-    if (this.password && this.password.trim() !== '') {
-      if (this.password.length < 6) {
-        this.error = 'La contraseña debe tener al menos 6 caracteres.';
-        this.cargando = false;
-        return;
-      }
-      data.password = this.password;
-    }
-
-    // Decidir qué enviar: URL o archivo
-    if (this.modoImagen === 'url' && this.avatarUrl && this.avatarUrl.trim() !== '') {
-      data.avatarUrl = this.avatarUrl;
-    } else if (this.modoImagen === 'file' && this.selectedFile) {
-      // Si hay archivo, usamos FormData
-      const formData = new FormData();
-      formData.append('nombre', data.nombre);
-      if (data.password) formData.append('password', data.password);
-      formData.append('avatar', this.selectedFile);
-      
-      this.http.put('http://localhost:8080/api/auth/perfil', formData, { withCredentials: true })
-        .subscribe({
-          next: (response: any) => {
-            this.cargando = false;
-            this.mensaje = '✅ Perfil actualizado correctamente.';
-            // Actualizar la vista previa con la nueva imagen del backend
-            if (response.avatarUrl) {
-              this.avatarPreview.set(response.avatarUrl);
-              this.avatarUrl = response.avatarUrl;
-            }
-            // Resetear el campo de archivo
-            this.selectedFile = null;
-            if (this.fileInput) {
-              this.fileInput.nativeElement.value = '';
-            }
-            // Actualizar el BehaviorSubject del AuthService (para navbar)
-            this.authService.actualizarUsuarioEnSesion(response);
-          },
-          error: (err) => {
-            this.cargando = false;
-            this.error = err.error || 'Error al actualizar el perfil.';
-            console.error(err);
-          }
-        });
+    // 1️⃣ Validar nombre obligatorio
+    if (!this.nombre || this.nombre.trim() === '') {
+      this.error = 'El nombre es obligatorio.';
+      this.cargando = false;
       return;
     }
 
-    // Si no hay archivo ni URL, solo enviar JSON
-    this.http.put('http://localhost:8080/api/auth/perfil', data, { withCredentials: true })
+    // 2️⃣ Validar contraseña (si se ingresó)
+    if (this.password && this.password.trim() !== '' && this.password.length < 6) {
+      this.error = 'La contraseña debe tener al menos 6 caracteres.';
+      this.cargando = false;
+      return;
+    }
+
+    // 3️⃣ Crear FormData (siempre, porque el backend espera multipart/form-data)
+    const formData = new FormData();
+    formData.append('nombre', this.nombre.trim());
+
+    // Contraseña (si se proporcionó)
+    if (this.password && this.password.trim() !== '') {
+      formData.append('password', this.password);
+    }
+
+    // 4️⃣ Manejar la imagen:
+    // - Si hay un archivo seleccionado, lo enviamos como 'avatar'
+    // - Si NO hay archivo pero SÍ hay URL manual, la enviamos como 'avatarUrl'
+    // - Si no hay ni archivo ni URL, no enviamos nada (el backend mantiene la actual)
+    if (this.selectedFile) {
+      formData.append('avatar', this.selectedFile, this.selectedFile.name);
+    } else if (this.modoImagen === 'url' && this.avatarUrl && this.avatarUrl.trim() !== '') {
+      formData.append('avatarUrl', this.avatarUrl.trim());
+    }
+
+    // 5️⃣ Enviar la petición
+    this.http.put('http://localhost:8080/api/auth/perfil', formData, { withCredentials: true })
       .subscribe({
         next: (response: any) => {
           this.cargando = false;
@@ -174,19 +164,25 @@ export class PerfilComponent {
             this.avatarPreview.set(response.avatarUrl);
             this.avatarUrl = response.avatarUrl;
           }
-          // Actualizar el BehaviorSubject
+          this.selectedFile = null;
+          if (this.fileInput) {
+            this.fileInput.nativeElement.value = '';
+          }
           this.authService.actualizarUsuarioEnSesion(response);
+          this.cdr.detectChanges(); // 👈 FORZAR REFRESCO
         },
         error: (err) => {
           this.cargando = false;
           this.error = err.error || 'Error al actualizar el perfil.';
           console.error(err);
+          this.cdr.detectChanges(); // 👈 FORZAR REFRESCO
         }
       });
   }
 
-  // 👉 Cancelar
-  cancelar() {
-    this.router.navigate(['/libros']);
-  }
+
+// 👉 Cancelar
+cancelar() {
+  this.router.navigate(['/libros']);
+}
 }
