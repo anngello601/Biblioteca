@@ -31,4 +31,9 @@ public class UsuarioService {
     public List<Usuario> listarTodos() {
         return usuarioRepository.findAll();
     }
+
+    // 👇 ESTA ES LA CORRECCIÓN: En lugar de lanzar error, guarda los cambios
+    public void actualizar(Usuario usuario) {
+        usuarioRepository.save(usuario);
+    }
 }

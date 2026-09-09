@@ -3,24 +3,30 @@
     <div class="d-flex align-items-center justify-content-between w-100 flex-wrap" style="height: 72px;">
       <!-- Logo -->
       <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/">
-        <img src="https://lh3.googleusercontent.com/aida/AEtjO1XZV4L_EYlda2TQJVPKhHfjCj4NrT2L2CWtxFhvlhKlDb3yxXVvxopHgiSzCTNB7SUsxoiTSVl8Qn0IFonaUjnPcy-xjyrKYXSIgrrTaVObvIXVJ91F8tp23bOdAi5pAsm2PAhpN7CpX0AHH9OwCPFI3uIlRcxdbHTWEyMMz5NNRoiaD9u8vqROY9Y9IUy5qe7F9qEYcPo0qjqHQ4SNnbTo94UHe4gYUWiURT5P7UPKTJvmlWufcBHdS44" alt="NovaBook" height="32">
+        <img
+          src="https://lh3.googleusercontent.com/aida/AEtjO1XZV4L_EYlda2TQJVPKhHfjCj4NrT2L2CWtxFhvlhKlDb3yxXVvxopHgiSzCTNB7SUsxoiTSVl8Qn0IFonaUjnPcy-xjyrKYXSIgrrTaVObvIXVJ91F8tp23bOdAi5pAsm2PAhpN7CpX0AHH9OwCPFI3uIlRcxdbHTWEyMMz5NNRoiaD9u8vqROY9Y9IUy5qe7F9qEYcPo0qjqHQ4SNnbTo94UHe4gYUWiURT5P7UPKTJvmlWufcBHdS44"
+          alt="NovaBook" height="32">
         <span class="font-serif fw-bold fs-5 text-dark">NovaBook</span>
       </a>
 
       <!-- Toggler para móvil -->
-      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false">
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+        aria-controls="navbarMain" aria-expanded="false">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <!-- Menú colapsable -->
       <div class="collapse navbar-collapse" id="navbarMain">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1">
-          <li class="nav-item"><a class="nav-link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" routerLink="/home" routerLinkActive="active"
+              [routerLinkActiveOptions]="{exact: true}">Inicio</a></li>
           <li class="nav-item"><a class="nav-link" routerLink="/libros" routerLinkActive="active">Catálogo</a></li>
           <li class="nav-item"><a class="nav-link" href="#" (click)="$event.preventDefault()">Más Vendidos</a></li>
-          <!-- Cambiamos "eBooks" por "Digital" (según tu diseño) -->
           <li class="nav-item"><a class="nav-link" href="#" (click)="$event.preventDefault()">Digital</a></li>
           <li class="nav-item"><a class="nav-link" href="#" (click)="$event.preventDefault()">Club de Lectura</a></li>
+          <!-- Nueva pestaña -->
+          <li class="nav-item"><a class="nav-link fw-bold text-primary" routerLink="/agregar-libro"
+              routerLinkActive="active">+ Agregar Libro</a></li>
         </ul>
 
         <div class="d-flex align-items-center gap-3">
@@ -29,27 +35,42 @@
             <span class="material-symbols-outlined">favorite</span>
           </a>
           <!-- Carrito -->
-          <a class="d-flex align-items-center gap-1 bg-light px-2 py-1 rounded-pill text-dark text-decoration-none" routerLink="/carrito">
+          <a class="d-flex align-items-center gap-1 bg-light px-2 py-1 rounded-pill text-dark text-decoration-none"
+            routerLink="/carrito">
             <span class="material-symbols-outlined">shopping_bag</span>
             <span class="badge bg-warning text-dark rounded-pill">{{ cantidadCarrito }}</span>
           </a>
+
           <!-- Perfil / Login -->
           @if (usuario) {
-            <div class="dropdown">
-              <a class="d-flex align-items-center gap-1 text-decoration-none text-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" (click)="$event.preventDefault()">
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBblQ2CnKmAsfYQmTh0_WkjwbM2hEW0FrN9l5ePEHsvwRLdgV9r6J1COGsA-xNIj19wX5UU_0x0OpbBcxuQqQAxP6qjnNhSpcDde7Eu05db2MO7CQ3wXp_kOdvdpuuoDScVTNAmWPi8GhNstOaIEMwqAr5AjvBj83ARnoOm6lX6TQElJq1vvQr7M0_344qLF-lSoTd8QowwIarlSb5RPbTHzJqlsXa69Ph7-eNVfnSvHP_7E_32epZj" alt="Perfil" height="32" class="rounded-circle">
-                <span class="d-none d-md-inline">{{ usuario.nombre }}</span>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="#" (click)="$event.preventDefault()">Mi Cuenta</a></li>
-                <li><a class="dropdown-item" href="#" (click)="$event.preventDefault()">Biblioteca</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" (click)="logout()">Cerrar sesión</a></li>
-              </ul>
-            </div>
+          <div class="position-relative user-menu-container">
+            <a (click)="toggleDropdown(); $event.preventDefault()" ...>
+
+              <!-- Usa el avatarUrl del usuario -->
+              <img [src]="usuario?.avatarUrl || 'https://i.ibb.co/nM8GvScD/pngwing-com.png'" alt="Perfil" height="32"
+                class="rounded-circle object-fit-cover border">
+
+              <span class="d-none d-md-inline">{{ usuario.nombre }}</span>
+              <span class="material-symbols-outlined" style="font-size: 18px;">arrow_drop_down</span>
+            </a>
+
+            @if (isDropdownOpen) {
+            <ul class="dropdown-menu dropdown-menu-end show position-absolute mt-2" style="right: 0; z-index: 1000;">
+              <li>
+                <a class="dropdown-item" (click)="irAPerfil()">Ver Perfil</a>
+              </li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li>
+                <a class="dropdown-item text-danger" (click)="logout()">Cerrar sesión</a>
+              </li>
+            </ul>
+            }
+          </div>
           } @else {
-            <a class="btn btn-outline-primary btn-sm" routerLink="/login">Iniciar sesión</a>
-            <a class="btn btn-primary btn-sm" routerLink="/registro">Registrarse</a>
+          <a class="btn btn-outline-primary btn-sm" routerLink="/login">Iniciar sesión</a>
+          <a class="btn btn-primary btn-sm" routerLink="/registro">Registrarse</a>
           }
         </div>
       </div>

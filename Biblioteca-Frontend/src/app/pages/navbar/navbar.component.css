@@ -39,3 +39,6 @@
   font-size: 1.5rem;
   vertical-align: middle;
 }
+.cursor-pointer {
+  cursor: pointer;
+}

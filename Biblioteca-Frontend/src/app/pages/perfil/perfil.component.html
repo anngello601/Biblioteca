@@ -1,0 +1,49 @@
+<div class="container mt-5 pt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow-sm border-0 p-4">
+        <h2 class="text-center mb-4">Mi Perfil</h2>
+
+        <div class="text-center mb-4">
+          <div class="position-relative d-inline-block">
+            <img [src]="avatarPreview()" class="rounded-circle border shadow-sm" width="140" height="140" style="object-fit: cover;">
+            
+            <div class="drop-zone" 
+                 (dragover)="onDragOver($event)" 
+                 (dragleave)="onDragLeave($event)" 
+                 (drop)="onDrop($event)"
+                 (click)="fileInput.click()"
+                 title="Haz clic o arrastra una imagen">
+              <span class="material-symbols-outlined">add_a_photo</span>
+              <p class="small mb-0">Subir foto</p>
+            </div>
+            <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected($event)">
+          </div>
+        </div>
+
+        <form (ngSubmit)="guardarPerfil()">
+          <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <!-- 👇 AÑADIDO: name="nombre" -->
+            <input type="text" class="form-control" 
+                   name="nombre"
+                   [ngModel]="formData().nombre" 
+                   (ngModelChange)="formData.update(f => ({ ...f, nombre: $event }))" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Nueva Contraseña</label>
+            <!-- 👇 AÑADIDO: name="password" -->
+            <input type="password" class="form-control" 
+                   name="password"
+                   [ngModel]="formData().password" 
+                   (ngModelChange)="formData.update(f => ({ ...f, password: $event }))" 
+                   placeholder="Dejar en blanco para no cambiarla">
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

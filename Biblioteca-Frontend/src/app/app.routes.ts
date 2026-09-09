@@ -8,6 +8,8 @@ import { CheckoutComponent } from './pages/checkout/checkout.component';
 import { ExitoComponent } from './pages/exito/exito.component';
 import { AuthGuard } from './guards/auth.guard';
 import { HomeComponent } from './pages/home/home.component';
+import { PerfilComponent } from './pages/perfil/perfil.component';
+import { AgregarLibroComponent } from './pages/libros/agregar-libro/agregar-libro.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/libros', pathMatch: 'full' },
@@ -19,5 +21,7 @@ export const routes: Routes = [
   { path: 'checkout', component: CheckoutComponent, canActivate: [AuthGuard] },
   { path: 'exito', component: ExitoComponent, canActivate: [AuthGuard] },
   { path: 'home', component: HomeComponent },
-  { path: '**', redirectTo: '/libros' }
+  { path: 'perfil', component: PerfilComponent },
+  { path: 'agregar-libro', component: AgregarLibroComponent },
+  { path: '**', redirectTo: '/home' }
 ];

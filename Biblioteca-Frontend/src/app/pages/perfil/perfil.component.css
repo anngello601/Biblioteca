@@ -1,0 +1,28 @@
+.avatar-wrapper {
+  cursor: pointer;
+}
+
+.drop-zone {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 10px;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.avatar-wrapper:hover .drop-zone {
+  opacity: 1;
+}
+
+.drop-zone .material-symbols-outlined {
+  font-size: 18px;
+}

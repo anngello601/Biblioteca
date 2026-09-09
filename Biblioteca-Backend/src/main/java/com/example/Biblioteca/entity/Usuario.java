@@ -16,4 +16,5 @@ public class Usuario {
     private String nombre;
     private String email;
     private String password;
+    private String avatarUrl = "https://i.ibb.co/nM8GvScD/pngwing-com.png"; 
 }
