@@ -1,48 +1,84 @@
-<div class="container mt-5 pt-5">
+<div class="container py-5">
   <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-      <div class="card shadow-sm border-0 p-4">
-        <h2 class="text-center mb-4">Mi Perfil</h2>
+    <div class="col-lg-8 col-md-10">
+      <div class="card border-0 shadow-lg rounded-4">
+        <div class="card-body p-5">
+          <h2 class="fw-bold text-center mb-4">
+            <i class="fas fa-user-edit me-2 text-primary"></i>Mi Perfil
+          </h2>
 
-        <div class="text-center mb-4">
-          <div class="position-relative d-inline-block">
-            <img [src]="avatarPreview()" class="rounded-circle border shadow-sm" width="140" height="140" style="object-fit: cover;">
-            
-            <div class="drop-zone" 
-                 (dragover)="onDragOver($event)" 
-                 (dragleave)="onDragLeave($event)" 
-                 (drop)="onDrop($event)"
-                 (click)="fileInput.click()"
-                 title="Haz clic o arrastra una imagen">
-              <span class="material-symbols-outlined">add_a_photo</span>
-              <p class="small mb-0">Subir foto</p>
+          <!-- Mensajes -->
+          @if (mensaje) {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              {{ mensaje }}
+              <button type="button" class="btn-close" (click)="mensaje=''"></button>
             </div>
-            <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected($event)">
+          }
+          @if (error) {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              {{ error }}
+              <button type="button" class="btn-close" (click)="error=''"></button>
+            </div>
+          }
+
+          <!-- Foto de perfil -->
+          <div class="text-center mb-4">
+            <div class="position-relative d-inline-block">
+              <img [src]="avatarPreview()" class="rounded-circle border shadow-sm" width="140" height="140" style="object-fit: cover;">
+              
+              <!-- Drop zone para subir archivo -->
+              <div class="drop-zone" 
+                   (dragover)="onDragOver($event)" 
+                   (dragleave)="onDragLeave($event)" 
+                   (drop)="onDrop($event)"
+                   (click)="fileInput.click()"
+                   title="Haz clic o arrastra una imagen">
+                <span class="material-symbols-outlined">add_a_photo</span>
+                <p class="small mb-0">Subir foto</p>
+              </div>
+              <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected($event)">
+            </div>
+          </div>
+
+          <!-- Input para URL de imagen -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">URL de la foto de perfil</label>
+            <div class="input-group">
+              <input type="url" class="form-control" [(ngModel)]="avatarUrl" name="avatarUrl"
+                     placeholder="https://ejemplo.com/foto.jpg">
+              <button class="btn btn-outline-secondary" type="button" (click)="previsualizarUrl()">
+                <i class="fas fa-eye"></i> Previsualizar
+              </button>
+            </div>
+            <small class="text-muted">Ingresa una URL de imagen o sube un archivo desde el área de arriba.</small>
+          </div>
+
+          <!-- Nombre -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Nombre completo</label>
+            <input type="text" class="form-control" [(ngModel)]="nombre" name="nombre" required>
+          </div>
+
+          <!-- Nueva contraseña -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Nueva contraseña <span class="text-muted small">(opcional)</span></label>
+            <input type="password" class="form-control" [(ngModel)]="password" name="password"
+                   placeholder="Dejar en blanco para no cambiarla" minlength="6">
+          </div>
+
+          <!-- Botones -->
+          <div class="d-flex gap-3 mt-4">
+            <button type="button" class="btn btn-primary btn-lg flex-grow-1" (click)="guardarPerfil()" [disabled]="cargando">
+              @if (cargando) {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+              }
+              {{ cargando ? 'Guardando...' : 'Guardar cambios' }}
+            </button>
+            <button type="button" class="btn btn-outline-secondary btn-lg" (click)="cancelar()">
+              Cancelar
+            </button>
           </div>
         </div>
-
-        <form (ngSubmit)="guardarPerfil()">
-          <div class="mb-3">
-            <label class="form-label">Nombre</label>
-            <!-- 👇 AÑADIDO: name="nombre" -->
-            <input type="text" class="form-control" 
-                   name="nombre"
-                   [ngModel]="formData().nombre" 
-                   (ngModelChange)="formData.update(f => ({ ...f, nombre: $event }))" required>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Nueva Contraseña</label>
-            <!-- 👇 AÑADIDO: name="password" -->
-            <input type="password" class="form-control" 
-                   name="password"
-                   [ngModel]="formData().password" 
-                   (ngModelChange)="formData.update(f => ({ ...f, password: $event }))" 
-                   placeholder="Dejar en blanco para no cambiarla">
-          </div>
-
-          <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
-        </form>
       </div>
     </div>
   </div>

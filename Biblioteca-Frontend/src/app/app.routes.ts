@@ -21,7 +21,7 @@ export const routes: Routes = [
   { path: 'checkout', component: CheckoutComponent, canActivate: [AuthGuard] },
   { path: 'exito', component: ExitoComponent, canActivate: [AuthGuard] },
   { path: 'home', component: HomeComponent },
-  { path: 'perfil', component: PerfilComponent },
+{ path: 'perfil', component: PerfilComponent, canActivate: [AuthGuard] },
   { path: 'agregar-libro', component: AgregarLibroComponent },
   { path: '**', redirectTo: '/home' }
 ];
