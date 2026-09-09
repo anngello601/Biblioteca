@@ -23,6 +23,10 @@ public class LibroService {
         return libroRepository.findByTipo(tipo, pageable);
     }
 
+    public Page<Libro> buscar(String search, Pageable pageable) {
+        return libroRepository.findByNombreContainingIgnoreCaseOrAutorContainingIgnoreCase(search, search, pageable);
+    }
+
     public Optional<Libro> obtenerPorId(Long id) {
         return libroRepository.findById(id);
     }

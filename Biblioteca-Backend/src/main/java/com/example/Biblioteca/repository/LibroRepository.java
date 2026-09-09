@@ -7,4 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LibroRepository extends JpaRepository<Libro, Long> {
     Page<Libro> findByTipo(String tipo, Pageable pageable);
+
+    Page<Libro> findByNombreContainingIgnoreCaseOrAutorContainingIgnoreCase(String search, String search2,
+            Pageable pageable);
+
 }

@@ -20,20 +20,27 @@ public class LibroRestController {
         this.libroService = libroService;
     }
 
+    // ✅ ÚNICO MÉTODO GET (Con el parámetro 'search' incluido)
     @GetMapping
-    @SuppressWarnings("springdata") // 🔥 Suprime la advertencia de referencia no type-safe
     public Page<Libro> listarPaginado(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
-            @RequestParam(required = false) String tipo) {
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) String search) {
 
-        System.out.println("🔍 Filtro recibido en backend: " + tipo);
+        System.out.println("🔍 Filtro tipo: " + tipo + " | Búsqueda: " + search);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "nombre"));
 
+        // 1. Lógica de búsqueda por nombre o autor
+        if (search != null && !search.isEmpty()) {
+            return libroService.buscar(search, pageable);
+        }
+        // 2. Lógica de filtro por tipo
         if (tipo != null && !tipo.isEmpty()) {
             return libroService.listarPorTipo(tipo, pageable);
         }
+        // 3. Listado normal
         return libroService.listarTodos(pageable);
     }
 

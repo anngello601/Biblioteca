@@ -7,63 +7,54 @@
       <div class="row g-3">
         <div class="col-md-6">
           <label class="form-label">Nombre del Libro *</label>
-          <input type="text" class="form-control" name="nombre" 
-                 [ngModel]="formLibro().nombre" 
-                 (ngModelChange)="formLibro.update(f => ({ ...f, nombre: $event }))" required>
+          <input type="text" class="form-control" name="nombre" [ngModel]="formLibro().nombre"
+            (ngModelChange)="formLibro.update(f => ({ ...f, nombre: $event }))" required>
         </div>
         <div class="col-md-3">
           <label class="form-label">Tipo *</label>
-          <select class="form-select" name="tipo" 
-                  [ngModel]="formLibro().tipo" 
-                  (ngModelChange)="formLibro.update(f => ({ ...f, tipo: $event }))">
+          <select class="form-select" name="tipo" [ngModel]="formLibro().tipo"
+            (ngModelChange)="formLibro.update(f => ({ ...f, tipo: $event }))">
             <option value="FISICO">Físico</option>
             <option value="DIGITAL">Digital</option>
           </select>
         </div>
         <div class="col-md-3">
           <label class="form-label">Stock</label>
-          <input type="number" class="form-control" name="stock" 
-                 [ngModel]="formLibro().stock" 
-                 (ngModelChange)="formLibro.update(f => ({ ...f, stock: $event }))">
+          <input type="number" class="form-control" name="stock" [ngModel]="formLibro().stock"
+            (ngModelChange)="formLibro.update(f => ({ ...f, stock: $event }))">
         </div>
-        
+
         <div class="col-md-6">
           <label class="form-label">Autor *</label>
-          <input type="text" class="form-control" name="autor" 
-                 [ngModel]="formLibro().autor" 
-                 (ngModelChange)="formLibro.update(f => ({ ...f, autor: $event }))" required>
+          <input type="text" class="form-control" name="autor" [ngModel]="formLibro().autor"
+            (ngModelChange)="formLibro.update(f => ({ ...f, autor: $event }))" required>
         </div>
         <div class="col-md-6">
           <label class="form-label">Editorial</label>
-          <input type="text" class="form-control" name="editorial" 
-                 [ngModel]="formLibro().editorial" 
-                 (ngModelChange)="formLibro.update(f => ({ ...f, editorial: $event }))">
+          <input type="text" class="form-control" name="editorial" [ngModel]="formLibro().editorial"
+            (ngModelChange)="formLibro.update(f => ({ ...f, editorial: $event }))">
         </div>
 
         <div class="col-md-4">
           <label class="form-label">Año Publicación</label>
-          <input type="number" class="form-control" name="anioPublicacion" 
-                 [ngModel]="formLibro().anioPublicacion" 
-                 (ngModelChange)="formLibro.update(f => ({ ...f, anioPublicacion: $event }))">
+          <input type="number" class="form-control" name="anioPublicacion" [ngModel]="formLibro().anioPublicacion"
+            (ngModelChange)="formLibro.update(f => ({ ...f, anioPublicacion: $event }))">
         </div>
         <div class="col-md-4">
           <label class="form-label">Precio *</label>
-          <input type="number" step="0.01" class="form-control" name="precio" 
-                 [ngModel]="formLibro().precio" 
-                 (ngModelChange)="formLibro.update(f => ({ ...f, precio: $event }))" required>
+          <input type="number" step="0.01" class="form-control" name="precio" [ngModel]="formLibro().precio"
+            (ngModelChange)="formLibro.update(f => ({ ...f, precio: $event }))" required>
         </div>
         <div class="col-md-4">
           <label class="form-label">Portada (URL)</label>
-          <input type="text" class="form-control" name="portada" 
-                 [ngModel]="formLibro().portada" 
-                 (ngModelChange)="formLibro.update(f => ({ ...f, portada: $event }))" placeholder="https://...">
+          <input type="text" class="form-control" name="portada" [ngModel]="formLibro().portada"
+            (ngModelChange)="formLibro.update(f => ({ ...f, portada: $event }))" placeholder="https://...">
         </div>
 
         <div class="col-12">
           <label class="form-label">Descripción</label>
-          <textarea class="form-control" name="descripcion" rows="3"
-                    [ngModel]="formLibro().descripcion" 
-                    (ngModelChange)="formLibro.update(f => ({ ...f, descripcion: $event }))"></textarea>
+          <textarea class="form-control" name="descripcion" rows="3" [ngModel]="formLibro().descripcion"
+            (ngModelChange)="formLibro.update(f => ({ ...f, descripcion: $event }))"></textarea>
         </div>
       </div>
 
@@ -72,22 +63,39 @@
           {{ editandoId() !== null ? 'Guardar Cambios' : 'Agregar Libro' }}
         </button>
         @if (editandoId() !== null) {
-          <button type="button" class="btn btn-secondary" (click)="limpiarFormulario()">Cancelar Edición</button>
+        <button type="button" class="btn btn-secondary" (click)="limpiarFormulario()">Cancelar Edición</button>
         }
       </div>
     </form>
   </div>
 
   <!-- Tabla de libros con filtro y paginación -->
-  <h3 class="mb-3">Libros Existentes ({{ totalElements() }})</h3>
-  
-  <div class="d-flex justify-content-end mb-3">
-    <select class="form-select w-auto" (change)="aplicarFiltro()" [(ngModel)]="filtroTipo">
+  <!-- 🔍 Fila de Búsqueda y Filtro -->
+  <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+
+    <!-- Input de búsqueda por nombre o autor -->
+    <div class="input-group" style="max-width: 400px;">
+      <input type="text" class="form-control" name="searchTerm" placeholder="Buscar por nombre o autor..."
+        [(ngModel)]="searchTerm" (keyup.enter)="buscarLibros()"> <!-- Busca al presionar Enter -->
+      <button class="btn btn-outline-primary" type="button" (click)="buscarLibros()">
+        <span class="material-symbols-outlined">search</span>
+      </button>
+    </div>
+
+    <!-- Filtro por tipo -->
+    <select class="form-select w-auto" name="filtroTipo" (change)="buscarLibros()" [(ngModel)]="filtroTipo">
       <option value="">Todos los tipos</option>
       <option value="FISICO">Físico</option>
       <option value="DIGITAL">Digital</option>
     </select>
+
+    <!-- Botón para limpiar filtros -->
+    <button class="btn btn-outline-secondary" type="button" (click)="limpiarBusqueda()">
+      Limpiar
+    </button>
   </div>
+
+
 
   <div class="table-responsive">
     <table class="table table-hover align-middle">
@@ -104,32 +112,34 @@
       </thead>
       <tbody>
         @for (libro of libros(); track libro.id) {
-          <tr>
-            <td>
-              @if (libro.portada) {
-                <img [src]="libro.portada" alt="Portada" style="width: 50px; height: 70px; object-fit: cover;" class="rounded">
-              } @else {
-                <span class="text-muted">Sin imagen</span>
-              }
-            </td>
-            <td>{{ libro.nombre }}</td>
-            <td>{{ libro.autor }}</td>
-            <td><span class="badge" [ngClass]="libro.tipo === 'DIGITAL' ? 'bg-info' : 'bg-secondary'">{{ libro.tipo }}</span></td>
-            <td>${{ libro.precio | number:'1.2-2' }}</td>
-            <td>{{ libro.stock }}</td>
-            <td>
-              <button class="btn btn-sm btn-outline-primary me-2" (click)="editarLibro(libro)">
-                Editar
-              </button>
-              <button class="btn btn-sm btn-outline-danger" (click)="eliminarLibro(libro.id!)">
-                Eliminar
-              </button>
-            </td>
-          </tr>
+        <tr>
+          <td>
+            @if (libro.portada) {
+            <img [src]="libro.portada" alt="Portada" style="width: 50px; height: 70px; object-fit: cover;"
+              class="rounded">
+            } @else {
+            <span class="text-muted">Sin imagen</span>
+            }
+          </td>
+          <td>{{ libro.nombre }}</td>
+          <td>{{ libro.autor }}</td>
+          <td><span class="badge" [ngClass]="libro.tipo === 'DIGITAL' ? 'bg-info' : 'bg-secondary'">{{ libro.tipo
+              }}</span></td>
+          <td>S/ {{ libro.precio | number:'1.2-2' }}</td>
+          <td>{{ libro.stock }}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary me-2" (click)="editarLibro(libro)">
+              Editar
+            </button>
+            <button class="btn btn-sm btn-outline-danger" (click)="eliminarLibro(libro.id!)">
+              Eliminar
+            </button>
+          </td>
+        </tr>
         } @empty {
-          <tr>
-            <td colspan="7" class="text-center text-muted py-4">No hay libros en esta página.</td>
-          </tr>
+        <tr>
+          <td colspan="7" class="text-center text-muted py-4">No hay libros en esta página.</td>
+        </tr>
         }
       </tbody>
     </table>

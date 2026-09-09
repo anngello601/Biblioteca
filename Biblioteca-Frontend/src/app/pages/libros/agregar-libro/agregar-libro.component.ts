@@ -13,6 +13,8 @@ import { Libro } from '../../../models/libro.model';
 })
 export class AgregarLibroComponent implements OnInit {
   private libroService = inject(LibroService);
+  searchTerm = signal<string>(''); // 👈 Nueva señal
+
 
   // Estado de paginación
   libros = signal<Libro[]>([]);
@@ -23,7 +25,7 @@ export class AgregarLibroComponent implements OnInit {
 
   // Señales con tipo explícito
   editandoId: WritableSignal<number | null> = signal<number | null>(null);
-  
+
   formLibro: WritableSignal<Libro> = signal<Libro>({
     id: 0, // Inicializamos con 0 para que TypeScript no se queje
     nombre: '',
@@ -42,8 +44,12 @@ export class AgregarLibroComponent implements OnInit {
   }
 
   cargarLibros() {
-    // ✅ CORREGIDO: El método se llama 'listarPaginado' (no 'getLibros')
-    this.libroService.listarPaginado(this.currentPage(), 12, this.filtroTipo() || undefined).subscribe({
+    this.libroService.listarPaginado(
+      this.currentPage(),
+      12,
+      this.filtroTipo() || undefined,
+      this.searchTerm() || undefined // 👈 Pasar el término de búsqueda
+    ).subscribe({
       next: (data) => {
         this.libros.set(data.content);
         this.totalPages.set(data.totalPages);
@@ -52,6 +58,19 @@ export class AgregarLibroComponent implements OnInit {
       error: (err) => console.error('Error al cargar libros:', err)
     });
   }
+
+  buscarLibros() {
+    this.currentPage.set(0); // Reinicia a la primera página al buscar
+    this.cargarLibros();
+  }
+
+  // Función para limpiar la búsqueda
+  limpiarBusqueda() {
+    this.searchTerm.set('');
+    this.currentPage.set(0);
+    this.cargarLibros();
+  }
+
 
   cambiarPagina(pagina: number) {
     if (pagina >= 0 && pagina < this.totalPages()) {
@@ -86,7 +105,7 @@ export class AgregarLibroComponent implements OnInit {
     } else {
       // CREACIÓN: Quitamos el id: 0 usando desestructuración para que el backend lo genere
       const { id, ...libroSinId } = libro;
-      
+
       this.libroService.crearLibro(libroSinId as Libro).subscribe({
         next: () => {
           alert('Libro agregado correctamente');

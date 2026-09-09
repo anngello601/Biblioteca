@@ -10,13 +10,16 @@ export class LibroService {
   private apiUrl = 'http://localhost:8080/api/libros';
 
   // 📚 Método usado por "listado" y "home" (retorna un objeto Page de Spring Boot)
-  listarPaginado(page: number = 0, size: number = 12, tipo?: string): Observable<any> {
+  listarPaginado(page: number = 0, size: number = 12, tipo?: string, search?: string): Observable<any> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
 
     if (tipo) {
       params = params.set('tipo', tipo);
+    }
+    if (search) { // 👈 AGREGADO
+      params = params.set('search', search);
     }
 
     return this.http.get<any>(this.apiUrl, { params });
@@ -41,4 +44,6 @@ export class LibroService {
   eliminar(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+
 }
