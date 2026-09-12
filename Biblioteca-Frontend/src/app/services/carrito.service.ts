@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface CarritoResponse {
   items: { [key: string]: number };
@@ -10,7 +11,7 @@ export interface CarritoResponse {
 
 @Injectable({ providedIn: 'root' })
 export class CarritoService {
-  private apiUrl = 'http://localhost:8080/api/carrito';
+  private apiUrl =`${environment.apiUrl}/carrito`;
 
   constructor(private http: HttpClient) {}
 

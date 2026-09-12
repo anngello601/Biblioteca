@@ -3,11 +3,12 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Libro } from '../models/libro.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class LibroService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/libros';
+  private apiUrl = `${environment.apiUrl}/libros`; 
 
   // 📚 Método usado por "listado" y "home" (retorna un objeto Page de Spring Boot)
   listarPaginado(page: number = 0, size: number = 12, tipo?: string, search?: string): Observable<any> {
