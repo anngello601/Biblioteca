@@ -1,188 +1,181 @@
 import { Component, inject, signal, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { ChangeDetectorRef } from '@angular/core';
-
+import { Usuario } from '../../models/usuario.model';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './perfil.component.html',
-  styleUrls: ['./perfil.component.css']
+  styleUrls: ['./perfil.component.css'],
 })
 export class PerfilComponent {
-  private http = inject(HttpClient);
   private authService = inject(AuthService);
   private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef); // 👈 NUEVO
-
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   readonly defaultAvatarUrl = 'https://i.ibb.co/nM8GvScD/pngwing-com.png';
 
-  // Estado del formulario
+  // Datos del formulario
   nombre = '';
   password = '';
-  // Para la foto
-  avatarUrl = '';           // URL manual
+  avatarUrl = '';
   selectedFile: File | null = null;
-  avatarPreview = signal<string>(this.defaultAvatarUrl);
-  modoImagen: 'url' | 'file' = 'url'; // para saber qué modo usar al guardar
+  modoImagen: 'url' | 'file' = 'url';
 
-  // Mensajes
-  mensaje = '';
-  error = '';
-  cargando = false;
+  // Signals para UI
+  avatarPreview = signal<string>(this.defaultAvatarUrl);
+  mensaje = signal('');
+  error = signal('');
+  cargando = signal(false);
 
   constructor() {
-    // Cargar datos del usuario actual
+    this.cargarPerfil();
+  }
+
+  // ==========================
+  // Cargar datos del usuario
+  // ==========================
+  private cargarPerfil(): void {
     this.authService.getUsuarioActual().subscribe({
-      next: (user: any) => {
+      next: (user: Usuario | null) => {
         if (user) {
-          this.nombre = user.nombre;
-          this.avatarUrl = user.avatarUrl || '';
+          this.nombre = user.nombre ?? '';
+          this.avatarUrl = user.avatarUrl ?? '';
           this.avatarPreview.set(user.avatarUrl || this.defaultAvatarUrl);
-          // Si tiene avatarUrl, lo mostramos
-          if (user.avatarUrl) {
-            this.modoImagen = 'url';
-          }
+          if (user.avatarUrl) this.modoImagen = 'url';
         }
-        this.cdr.detectChanges();
       },
       error: (err) => {
-        this.cargando = false;
-        this.error = err.error || 'Error al actualizar el perfil.';
-        this.cdr.detectChanges(); // 👈 TAMBIÉN AQUÍ
+        this.error.set(err?.error?.message || 'Error al cargar el perfil.');
         console.error(err);
-      }
+      },
     });
   }
 
-  // 👉 Manejo de archivo (drag & drop / click)
+  // ==========================
+  // Manejo de archivo
+  // ==========================
   onDragOver(event: DragEvent) {
     event.preventDefault();
   }
   onDragLeave(event: DragEvent) {
     event.preventDefault();
   }
+
   onDrop(event: DragEvent) {
     event.preventDefault();
     const file = event.dataTransfer?.files[0];
-    if (file) {
-      this.procesarArchivo(file);
-    }
+    if (file) this.procesarArchivo(file);
   }
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.procesarArchivo(file);
-    }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) this.procesarArchivo(file);
   }
 
   private procesarArchivo(file: File) {
     if (!file.type.startsWith('image/')) {
-      this.error = 'Solo se permiten imágenes.';
+      this.error.set('Solo se permiten imágenes.');
       return;
     }
     this.selectedFile = file;
     this.modoImagen = 'file';
-    // Vista previa local
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      this.avatarPreview.set(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-    // Limpiar el campo URL para no confundir
     this.avatarUrl = '';
-    this.error = '';
+
+    const reader = new FileReader();
+    reader.onload = (e) => this.avatarPreview.set(e.target?.result as string);
+    reader.readAsDataURL(file);
+
+    this.error.set('');
   }
 
-  // 👉 Previsualizar URL manual
+  // ==========================
+  // Previsualizar URL manual
+  // ==========================
   previsualizarUrl() {
     if (this.avatarUrl && this.avatarUrl.trim() !== '') {
       this.modoImagen = 'url';
-      this.selectedFile = null; // si se usa URL, descartar archivo
+      this.selectedFile = null;
       this.avatarPreview.set(this.avatarUrl);
-      this.error = '';
+      this.error.set('');
     } else {
-      // Si la URL está vacía, volver a la imagen por defecto (o la actual)
-      this.avatarPreview.set(this.avatarUrl || this.defaultAvatarUrl);
+      this.avatarPreview.set(this.defaultAvatarUrl);
     }
   }
 
-  // 👉 Guardar perfil
+  // ==========================
+  // Guardar perfil (UNA SOLA llamada)
+  // ==========================
   guardarPerfil() {
-    this.error = '';
-    this.mensaje = '';
-    this.cargando = true;
+    this.error.set('');
+    this.mensaje.set('');
 
-    // 1️⃣ Validar nombre obligatorio
+    // 1. Validar nombre
     if (!this.nombre || this.nombre.trim() === '') {
-      this.error = 'El nombre es obligatorio.';
-      this.cargando = false;
+      this.error.set('El nombre es obligatorio.');
       return;
     }
 
-    // 2️⃣ Validar contraseña (si se ingresó)
-    if (this.password && this.password.trim() !== '' && this.password.length < 6) {
-      this.error = 'La contraseña debe tener al menos 6 caracteres.';
-      this.cargando = false;
+    // 2. Validar contraseña (si se ingresó)
+    if (this.password && this.password.length < 6) {
+      this.error.set('La contraseña debe tener al menos 6 caracteres.');
       return;
     }
 
-    // 3️⃣ Crear FormData (siempre, porque el backend espera multipart/form-data)
+    // 3. Construir FormData
     const formData = new FormData();
     formData.append('nombre', this.nombre.trim());
 
-    // Contraseña (si se proporcionó)
     if (this.password && this.password.trim() !== '') {
       formData.append('password', this.password);
     }
 
-    // 4️⃣ Manejar la imagen:
-    // - Si hay un archivo seleccionado, lo enviamos como 'avatar'
-    // - Si NO hay archivo pero SÍ hay URL manual, la enviamos como 'avatarUrl'
-    // - Si no hay ni archivo ni URL, no enviamos nada (el backend mantiene la actual)
     if (this.selectedFile) {
       formData.append('avatar', this.selectedFile, this.selectedFile.name);
-    } else if (this.modoImagen === 'url' && this.avatarUrl && this.avatarUrl.trim() !== '') {
+    } else if (this.modoImagen === 'url' && this.avatarUrl.trim() !== '') {
       formData.append('avatarUrl', this.avatarUrl.trim());
     }
 
-    // 5️⃣ Enviar la petición
-    this.http.put('http://localhost:8080/api/auth/perfil', formData, { withCredentials: true })
-      .subscribe({
-        next: (response: any) => {
-          this.cargando = false;
-          this.mensaje = '✅ Perfil actualizado correctamente.';
-          if (response.avatarUrl) {
-            this.avatarPreview.set(response.avatarUrl);
-            this.avatarUrl = response.avatarUrl;
-          }
-          this.selectedFile = null;
-          if (this.fileInput) {
-            this.fileInput.nativeElement.value = '';
-          }
-          this.authService.actualizarUsuarioEnSesion(response);
-          this.cdr.detectChanges(); // 👈 FORZAR REFRESCO
-        },
-        error: (err) => {
-          this.cargando = false;
-          this.error = err.error || 'Error al actualizar el perfil.';
-          console.error(err);
-          this.cdr.detectChanges(); // 👈 FORZAR REFRESCO
+    // 4. UNA sola llamada al backend (a través del servicio)
+    this.cargando.set(true);
+
+    this.authService.actualizarPerfil(formData).subscribe({
+      next: (response: Usuario) => {
+        this.cargando.set(false);
+        this.mensaje.set('✅ Perfil actualizado correctamente.');
+        this.password = ''; // limpia contraseña
+        this.selectedFile = null;
+        if (response.avatarUrl) {
+          this.avatarPreview.set(response.avatarUrl);
+          this.avatarUrl = response.avatarUrl;
         }
-      });
+        if (this.fileInput) {
+          this.fileInput.nativeElement.value = '';
+        }
+        // El navbar se actualiza SOLO porque AuthService usa signals
+      },
+      error: (err) => {
+        this.cargando.set(false);
+        this.error.set(
+          typeof err.error === 'string'
+            ? err.error
+            : err.error?.message || 'Error al actualizar el perfil.',
+        );
+        console.error(err);
+      },
+    });
   }
 
-
-// 👉 Cancelar
-cancelar() {
-  this.router.navigate(['/libros']);
-}
+  // ==========================
+  // Cancelar
+  // ==========================
+  cancelar() {
+    this.router.navigate(['/libros']);
+  }
 }

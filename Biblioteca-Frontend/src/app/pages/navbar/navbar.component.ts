@@ -1,94 +1,54 @@
-import { Component, OnInit, OnDestroy, inject, HostListener } from '@angular/core';
-import { RouterLink, RouterLinkActive, Router } from '@angular/router'; // 👈 Unifica importaciones
-import { Subscription } from 'rxjs';
+import { Component, HostListener, signal, computed, inject } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
-import { CarritoService } from '../../services/carrito.service';
-import { Usuario } from '../../models/usuario.model';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive], // ← ahora sí se usa
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css']
+  styleUrls: ['./navbar.component.css'],
 })
-export class NavbarComponent implements OnInit, OnDestroy {
-  private authService = inject(AuthService);
-  private carritoService = inject(CarritoService);
+export class NavbarComponent {
   private router = inject(Router);
+  private authService = inject(AuthService);
 
-  usuario: Usuario | null = null;
-  cantidadCarrito = 0;
-  
-  // Propiedad para el menú desplegable
-  isDropdownOpen = false;
+  usuario = this.authService.usuario;
 
-  // URL del logo genérico (solo se usa si el usuario no tiene foto)
-  readonly defaultAvatarUrl = 'https://i.ibb.co/nM8GvScD/pngwing-com.png';
+  isDropdownOpen = signal(false);
+  itemsCarrito = signal(0);
 
-  private subscriptions: Subscription[] = [];
+  estaLogueado = computed(() => this.usuario() !== null);
+  cantidadCarrito = computed(() => this.itemsCarrito());
+  nombreMostrar = computed(() => this.usuario()?.nombre ?? '');
+  avatarUrl = computed(
+    () => this.usuario()?.avatarUrl || 'https://i.ibb.co/nM8GvScD/pngwing-com.png',
+  );
 
-  ngOnInit() {
-    this.subscriptions.push(
-      this.authService.usuario$.subscribe(user => {
-        this.usuario = user;
-        console.log('Navbar actualizado con usuario:', user);
-      })
-    );
-
-    this.authService.getUsuarioActual().subscribe({
-      error: (err) => console.error('Error al restaurar sesión:', err)
-    });
-
-    this.subscriptions.push(
-      this.carritoService.verCarrito().subscribe({
-        next: (data) => this.cantidadCarrito = data.cantidadTotal,
-        error: () => this.cantidadCarrito = 0
-      })
-    );
+  toggleDropdown(event?: Event) {
+    event?.stopPropagation();
+    this.isDropdownOpen.update((v) => !v);
   }
 
-  ngOnDestroy() {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-  }
-
-  // 👇 MEJORA 1: Método para alternar el menú
-  toggleDropdown() {
-    this.isDropdownOpen = !this.isDropdownOpen;
-  }
-
-  // 👇 MEJORA 2: Cierra el menú si haces clic fuera
   @HostListener('document:click', ['$event'])
-  clickOut(event: MouseEvent) {
+  onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
     if (!target.closest('.user-menu-container')) {
-      this.isDropdownOpen = false;
+      this.isDropdownOpen.set(false);
     }
   }
 
-  // 👇 MEJORA 3: Método explícito para ir al perfil (cierra el menú y navega)
   irAPerfil() {
-    this.isDropdownOpen = false;
+    this.isDropdownOpen.set(false);
     this.router.navigate(['/perfil']);
   }
 
-  // 👇 MEJORA 4: Método mejorado para cerrar sesión
   logout() {
-    this.isDropdownOpen = false; // Cierra el menú inmediatamente
+    this.isDropdownOpen.set(false);
     this.authService.logout().subscribe({
-      next: () => {
-        this.router.navigate(['/login']);
-      },
-      error: (err) => {
-        console.error('Error al cerrar sesión:', err);
-        // Aún si falla, limpiamos la sesión local y redirigimos
-        this.router.navigate(['/login']);
-      }
+      next: () => this.router.navigate(['/home']),
+      error: () => this.router.navigate(['/home']),
     });
-  }
-
-  // 👇 MEJORA 5: Método para obtener la URL del avatar (si no hay, usa la de IBB)
-  getAvatarUrl(): string {
-    return this.usuario?.avatarUrl || this.defaultAvatarUrl;
   }
 }

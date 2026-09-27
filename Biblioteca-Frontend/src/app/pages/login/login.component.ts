@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
@@ -7,7 +7,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule,RouterLink],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -35,7 +35,12 @@ export class LoginComponent implements OnInit {
   onSubmit() {
     this.authService.login(this.email, this.password).subscribe({
       next: () => this.router.navigate(['/libros']),
-      error: (err) => this.error = err.error || 'Credenciales inválidas'
+      error: (err) => {
+        this.error =
+          typeof err.error === 'string'
+            ? err.error
+            : err.error?.message || 'Credenciales inválidas';
+      },
     });
   }
 }

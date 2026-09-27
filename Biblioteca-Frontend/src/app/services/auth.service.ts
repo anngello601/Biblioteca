@@ -1,22 +1,27 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, tap } from 'rxjs';
 import { Usuario } from '../models/usuario.model';
-import { environment } from '../../environments/environment.prod';
+import { environment } from '../../environments/environment'; // 👈 sin .prod
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/auth`;
 
-  private usuarioSubject = new BehaviorSubject<Usuario | null>(null);
-  usuario$ = this.usuarioSubject.asObservable();
+  // 🔥 Signal privado (fuente de verdad)
+  private _usuario = signal<Usuario | null>(this.cargarDeStorage());
 
-  constructor(private http: HttpClient) { }
+  // 🔥 Signal público de solo lectura
+  usuario = this._usuario.asReadonly();
+
+  // 🔥 Computed útil
+  estaLogueado = computed(() => this._usuario() !== null);
 
   login(email: string, password: string): Observable<Usuario> {
-    return this.http.post<Usuario>(`${this.apiUrl}/login`, { email, password }, { withCredentials: true })
-      .pipe(tap(usuario => this.usuarioSubject.next(usuario)));
+    return this.http
+      .post<Usuario>(`${this.apiUrl}/login`, { email, password }, { withCredentials: true })
+      .pipe(tap((usuario) => this.setUsuario(usuario)));
   }
 
   registro(usuario: Usuario): Observable<Usuario> {
@@ -24,32 +29,42 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/logout`, {}, { withCredentials: true })
-      .pipe(tap(() => this.usuarioSubject.next(null)));
+    return this.http
+      .post<void>(`${this.apiUrl}/logout`, {}, { withCredentials: true })
+      .pipe(tap(() => this.setUsuario(null)));
   }
 
   getUsuarioActual(): Observable<Usuario | null> {
-    return this.http.get<Usuario>(`${this.apiUrl}/usuario`, { withCredentials: true })
-      .pipe(
-        tap({
-          next: (usuario) => this.usuarioSubject.next(usuario),
-          error: () => this.usuarioSubject.next(null)
-        })
-      );
+    return this.http.get<Usuario>(`${this.apiUrl}/usuario`, { withCredentials: true }).pipe(
+      tap({
+        next: (u) => this.setUsuario(u),
+        error: () => this.setUsuario(null),
+      }),
+    );
   }
 
-  // 🔥 NUEVO: Actualizar perfil
   actualizarPerfil(formData: FormData): Observable<Usuario> {
-    return this.http.put<Usuario>(`${this.apiUrl}/perfil`, formData, { withCredentials: true })
-      .pipe(
-        tap(usuario => {
-          // Actualizar el BehaviorSubject con los nuevos datos
-          this.usuarioSubject.next(usuario);
-        })
-      );
+    return this.http
+      .put<Usuario>(`${this.apiUrl}/perfil`, formData, { withCredentials: true })
+      .pipe(tap((usuario) => this.setUsuario(usuario)));
   }
 
-  actualizarUsuarioEnSesion(usuario: Usuario) {
-    this.usuarioSubject.next(usuario);
+  // Métodos auxiliares privados
+  private setUsuario(u: Usuario | null): void {
+    this._usuario.set(u);
+    if (u) {
+      localStorage.setItem('usuario', JSON.stringify(u));
+    } else {
+      localStorage.removeItem('usuario');
+    }
+  }
+
+  private cargarDeStorage(): Usuario | null {
+    try {
+      const raw = localStorage.getItem('usuario');
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
   }
 }

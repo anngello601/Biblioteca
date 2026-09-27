@@ -1,77 +1,136 @@
-<header class="navbar navbar-expand-lg fixed-top bg-white/95 backdrop-blur-xl shadow-sm">
+<header class="navbar navbar-expand-lg fixed-top">
   <div class="container">
-    <div class="d-flex align-items-center justify-content-between w-100 flex-wrap" style="height: 72px;">
-      <!-- Logo -->
-      <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/">
-        <img
-          src="https://lh3.googleusercontent.com/aida/AEtjO1XZV4L_EYlda2TQJVPKhHfjCj4NrT2L2CWtxFhvlhKlDb3yxXVvxopHgiSzCTNB7SUsxoiTSVl8Qn0IFonaUjnPcy-xjyrKYXSIgrrTaVObvIXVJ91F8tp23bOdAi5pAsm2PAhpN7CpX0AHH9OwCPFI3uIlRcxdbHTWEyMMz5NNRoiaD9u8vqROY9Y9IUy5qe7F9qEYcPo0qjqHQ4SNnbTo94UHe4gYUWiURT5P7UPKTJvmlWufcBHdS44"
-          alt="NovaBook" height="32">
+
+    <div class="navbar-inner d-flex align-items-center justify-content-between w-100 flex-wrap">
+
+      <!-- ============================
+           LOGO
+           ============================ -->
+      <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/"
+         aria-label="NovaBook - Inicio">
+        <img src="/NovaBook.jpg" alt="NovaBook" width="60" height="60">
         <span class="font-serif fw-bold fs-5 text-dark">NovaBook</span>
       </a>
 
-      <!-- Toggler para móvil -->
-      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
-        aria-controls="navbarMain" aria-expanded="false">
+      <!-- ============================
+           TOGGLER MÓVIL
+           ============================ -->
+      <button class="navbar-toggler border-0"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarMain"
+              aria-controls="navbarMain"
+              aria-expanded="false"
+              aria-label="Abrir menú de navegación">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <!-- Menú colapsable -->
+      <!-- ============================
+           MENÚ COLAPSABLE
+           ============================ -->
       <div class="collapse navbar-collapse" id="navbarMain">
+
+        <!-- Links principales -->
         <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1">
-          <li class="nav-item"><a class="nav-link" routerLink="/home" routerLinkActive="active"
-              [routerLinkActiveOptions]="{exact: true}">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" routerLink="/libros" routerLinkActive="active">Catálogo</a></li>
-          <li class="nav-item"><a class="nav-link" href="#" (click)="$event.preventDefault()">Más Vendidos</a></li>
-          <li class="nav-item"><a class="nav-link" href="#" (click)="$event.preventDefault()">Digital</a></li>
-          <li class="nav-item"><a class="nav-link" href="#" (click)="$event.preventDefault()">Club de Lectura</a></li>
-          <!-- Nueva pestaña -->
-          <li class="nav-item"><a class="nav-link fw-bold text-primary" routerLink="/agregar-libro"
-              routerLinkActive="active">+ Agregar Libro</a></li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/home" routerLinkActive="active"
+               [routerLinkActiveOptions]="{exact: true}">Inicio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/libros" routerLinkActive="active">Catálogo</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/mas-vendidos" routerLinkActive="active">Más Vendidos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/digital" routerLinkActive="active">Digital</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/club-lectura" routerLinkActive="active">Club de Lectura</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-primary fw-bold" routerLink="/agregar-libro"
+               routerLinkActive="active">+ Agregar Libro</a>
+          </li>
         </ul>
 
-        <div class="d-flex align-items-center gap-3">
+        <!-- Acciones (carrito, perfil, auth) -->
+        <div class="navbar-actions d-flex align-items-center gap-3">
+
           <!-- Favoritos -->
-          <a class="text-dark" href="#" (click)="$event.preventDefault()" title="Favoritos">
+          <a class="icon-btn text-dark"
+             routerLink="/favoritos"
+             title="Favoritos"
+             aria-label="Favoritos">
             <span class="material-symbols-outlined">favorite</span>
           </a>
+
           <!-- Carrito -->
-          <a class="d-flex align-items-center gap-1 bg-light px-2 py-1 rounded-pill text-dark text-decoration-none"
-            routerLink="/carrito">
+          <a class="cart-btn d-flex align-items-center gap-1"
+             routerLink="/carrito"
+             aria-label="Carrito de compras">
             <span class="material-symbols-outlined">shopping_bag</span>
-            <span class="badge bg-warning text-dark rounded-pill">{{ cantidadCarrito }}</span>
+            @if (cantidadCarrito() > 0) {
+              <span class="badge bg-warning text-dark rounded-pill">
+                {{ cantidadCarrito() }}
+              </span>
+            }
           </a>
 
           <!-- Perfil / Login -->
-          @if (usuario) {
-          <div class="position-relative user-menu-container">
-            <a (click)="toggleDropdown(); $event.preventDefault()" ...>
+          @if (estaLogueado()) {
 
-              <!-- Usa el avatarUrl del usuario -->
-              <img [src]="usuario?.avatarUrl || 'https://i.ibb.co/nM8GvScD/pngwing-com.png'" alt="Perfil" height="32"
-                class="rounded-circle object-fit-cover border">
+            <div class="position-relative user-menu-container">
+              <a class="user-trigger d-flex align-items-center gap-2"
+                 role="button"
+                 tabindex="0"
+                 aria-haspopup="true"
+                 [attr.aria-expanded]="isDropdownOpen()"
+                 (click)="toggleDropdown($event)"
+                 (keydown.enter)="toggleDropdown($event)"
+                 (keydown.space)="toggleDropdown($event)">
+                <img [src]="avatarUrl()"
+                     alt="Foto de perfil"
+                     width="32" height="32"
+                     class="rounded-circle object-fit-cover border">
+                <span class="d-none d-md-inline user-name">{{ nombreMostrar() }}</span>
+                <span class="material-symbols-outlined arrow-icon"
+                      [class.rotated]="isDropdownOpen()">arrow_drop_down</span>
+              </a>
 
-              <span class="d-none d-md-inline">{{ usuario.nombre }}</span>
-              <span class="material-symbols-outlined" style="font-size: 18px;">arrow_drop_down</span>
-            </a>
+              @if (isDropdownOpen()) {
+                <ul class="dropdown-menu dropdown-menu-end show position-absolute mt-2"
+                    role="menu">
+                  <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2"
+                       role="menuitem"
+                       (click)="irAPerfil()">
+                      <span class="material-symbols-outlined">person</span>
+                      Ver perfil
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item text-danger d-flex align-items-center gap-2"
+                       role="menuitem"
+                       (click)="logout()">
+                      <span class="material-symbols-outlined">logout</span>
+                      Cerrar sesión
+                    </a>
+                  </li>
+                </ul>
+              }
+            </div>
 
-            @if (isDropdownOpen) {
-            <ul class="dropdown-menu dropdown-menu-end show position-absolute mt-2" style="right: 0; z-index: 1000;">
-              <li>
-                <a class="dropdown-item" (click)="irAPerfil()">Ver Perfil</a>
-              </li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li>
-                <a class="dropdown-item text-danger" (click)="logout()">Cerrar sesión</a>
-              </li>
-            </ul>
-            }
-          </div>
           } @else {
-          <a class="btn btn-outline-primary btn-sm" routerLink="/login">Iniciar sesión</a>
-          <a class="btn btn-primary btn-sm" routerLink="/registro">Registrarse</a>
+            <a class="btn btn-outline-primary btn-sm" routerLink="/login">
+              Iniciar sesión
+            </a>
+            <a class="btn btn-primary btn-sm" routerLink="/registro">
+              Registrarse
+            </a>
           }
+
         </div>
       </div>
     </div>

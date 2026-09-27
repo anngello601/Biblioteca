@@ -1,44 +1,262 @@
-.navbar {
-  background: rgba(255,255,255,0.95);
+/* ============================================
+   HEADER / NAVBAR
+   ============================================ */
+header.navbar {
+  background-color: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(16px);
-  box-shadow: 0 1px 8px rgba(0,0,0,0.04);
-  padding: 0.25rem 0;
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 1px 12px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.25s ease, background-color 0.25s ease;
+  padding: 0;
+  z-index: 1030;
 }
+
+header.navbar.scrolled {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* ============================================
+   LOGO
+   ============================================ */
 .navbar-brand {
-  font-size: 1.25rem;
+  text-decoration: none;
+  transition: transform 0.2s ease;
 }
-.navbar .nav-link {
+
+.navbar-brand:hover {
+  transform: translateY(-1px);
+}
+
+.navbar-brand img {
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.navbar-brand span {
+  letter-spacing: -0.5px;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+/* ============================================
+   LINKS DE NAVEGACIÓN
+   ============================================ */
+.navbar-nav .nav-link {
+  color: #374151;
   font-weight: 500;
-  color: #45464d;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
-  transition: background 0.15s, color 0.15s;
+  font-size: 0.95rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  position: relative;
+  transition: color 0.2s ease, background-color 0.2s ease;
 }
-.navbar .nav-link:hover,
-.navbar .nav-link.active {
-  background: #f3f4f5;
-  color: #0f172a;
+
+.navbar-nav .nav-link:hover {
+  color: #0d6efd;
+  background-color: rgba(13, 110, 253, 0.08);
 }
-.navbar .nav-link.active {
+
+.navbar-nav .nav-link.active {
+  color: #0d6efd;
   font-weight: 600;
+  background-color: rgba(13, 110, 253, 0.1);
 }
-.dropdown-menu {
-  border: none;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-  border-radius: 0.75rem;
-  padding: 0.5rem;
+
+/* Subrayado animado (opcional) */
+.navbar-nav .nav-link.active::after {
+  content: '';
+  position: absolute;
+  left: 0.9rem;
+  right: 0.9rem;
+  bottom: 0.15rem;
+  height: 2px;
+  background-color: #0d6efd;
+  border-radius: 2px;
 }
-.dropdown-item {
-  border-radius: 0.5rem;
-  padding: 0.4rem 0.75rem;
+
+/* Link especial "+ Agregar Libro" */
+.navbar-nav .nav-link.text-primary {
+  color: #0d6efd !important;
+  font-weight: 700;
 }
-.dropdown-item:hover {
-  background: #f3f4f5;
+
+.navbar-nav .nav-link.text-primary:hover {
+  background-color: rgba(13, 110, 253, 0.12);
 }
-.material-symbols-outlined {
-  font-size: 1.5rem;
+
+/* ============================================
+   TOGGLER (mobile)
+   ============================================ */
+.navbar-toggler {
+  padding: 0.35rem 0.6rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.navbar-toggler:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.navbar-toggler:focus {
+  box-shadow: none;
+  outline: 2px solid rgba(13, 110, 253, 0.4);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   CARRITO / FAVORITOS
+   ============================================ */
+header .material-symbols-outlined {
+  font-size: 22px;
+  transition: color 0.2s ease, transform 0.15s ease;
   vertical-align: middle;
+  user-select: none;
 }
-.cursor-pointer {
+
+a.text-dark:hover .material-symbols-outlined {
+  color: #0d6efd;
+  transform: scale(1.1);
+}
+
+/* Badge del carrito */
+.badge.bg-warning {
+  background-color: #ffc107 !important;
+  color: #1f2937 !important;
+  font-weight: 600;
+  font-size: 0.7rem;
+  padding: 0.3em 0.55em;
+  line-height: 1;
+}
+
+/* Píldora del carrito */
+a.rounded-pill {
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+a.rounded-pill:hover {
+  background-color: #e5e7eb !important;
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   PERFIL / DROPDOWN
+   ============================================ */
+.user-menu-container > a {
   cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  transition: background-color 0.2s ease;
+}
+
+.user-menu-container > a:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.user-menu-container img.rounded-circle {
+  border: 2px solid #e5e7eb;
+  transition: border-color 0.2s ease;
+}
+
+.user-menu-container > a:hover img.rounded-circle {
+  border-color: #0d6efd;
+}
+
+.user-menu-container .dropdown-menu {
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  padding: 0.4rem;
+  min-width: 180px;
+  animation: fadeInDown 0.15s ease-out;
+}
+
+.user-menu-container .dropdown-item {
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+}
+
+.user-menu-container .dropdown-item:hover {
+  background-color: #f3f4f6;
+}
+
+.user-menu-container .dropdown-item.text-danger:hover {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545 !important;
+}
+
+.user-menu-container .dropdown-divider {
+  margin: 0.25rem 0;
+  opacity: 0.6;
+}
+
+/* ============================================
+   BOTONES LOGIN / REGISTRO
+   ============================================ */
+.btn-outline-primary.btn-sm,
+.btn-primary.btn-sm {
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 0.35rem 0.9rem;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.btn-outline-primary.btn-sm:hover,
+.btn-primary.btn-sm:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2);
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 991.98px) {
+  header.navbar {
+    height: auto !important;
+  }
+
+  .navbar-collapse {
+    padding: 1rem 0;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 0.5rem;
+  }
+
+  .navbar-nav .nav-link {
+    padding: 0.65rem 0.9rem;
+    border-radius: 8px;
+  }
+
+  .navbar-nav .nav-link.active::after {
+    display: none;
+  }
+
+  .d-flex.align-items-center.gap-3 {
+    padding-top: 0.75rem;
+    border-top: 1px solid #e5e7eb;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
+/* ============================================
+   SCROLL SUAVE + OFFSET POR NAVBAR FIJO
+   ============================================ */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
 }

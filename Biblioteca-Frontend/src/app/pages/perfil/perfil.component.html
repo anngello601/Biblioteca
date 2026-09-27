@@ -8,16 +8,16 @@
           </h2>
 
           <!-- Mensajes -->
-          @if (mensaje) {
+          @if (mensaje()) {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-              {{ mensaje }}
-              <button type="button" class="btn-close" (click)="mensaje=''"></button>
+              {{ mensaje() }}
+              <button type="button" class="btn-close" (click)="mensaje.set('')"></button>
             </div>
           }
-          @if (error) {
+          @if (error()) {
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-              {{ error }}
-              <button type="button" class="btn-close" (click)="error=''"></button>
+              {{ error() }}
+              <button type="button" class="btn-close" (click)="error.set('')"></button>
             </div>
           }
 
@@ -25,11 +25,11 @@
           <div class="text-center mb-4">
             <div class="position-relative d-inline-block">
               <img [src]="avatarPreview()" class="rounded-circle border shadow-sm" width="140" height="140" style="object-fit: cover;">
-              
+
               <!-- Drop zone para subir archivo -->
-              <div class="drop-zone" 
-                   (dragover)="onDragOver($event)" 
-                   (dragleave)="onDragLeave($event)" 
+              <div class="drop-zone"
+                   (dragover)="onDragOver($event)"
+                   (dragleave)="onDragLeave($event)"
                    (drop)="onDrop($event)"
                    (click)="fileInput.click()"
                    title="Haz clic o arrastra una imagen">
@@ -68,13 +68,19 @@
 
           <!-- Botones -->
           <div class="d-flex gap-3 mt-4">
-            <button type="button" class="btn btn-primary btn-lg flex-grow-1" (click)="guardarPerfil()" [disabled]="cargando">
-              @if (cargando) {
-                <span class="spinner-border spinner-border-sm me-2"></span>
+            <button type="button"
+                    class="btn btn-primary btn-lg flex-grow-1"
+                    (click)="guardarPerfil()"
+                    [disabled]="cargando()">
+              @if (cargando()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
               }
-              {{ cargando ? 'Guardando...' : 'Guardar cambios' }}
+              {{ cargando() ? 'Guardando...' : 'Guardar cambios' }}
             </button>
-            <button type="button" class="btn btn-outline-secondary btn-lg" (click)="cancelar()">
+            <button type="button"
+                    class="btn btn-outline-secondary btn-lg"
+                    (click)="cancelar()"
+                    [disabled]="cargando()">
               Cancelar
             </button>
           </div>
