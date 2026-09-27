@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { Usuario } from '../../models/usuario.model';
 
+
 @Component({
   selector: 'app-perfil',
   standalone: true,

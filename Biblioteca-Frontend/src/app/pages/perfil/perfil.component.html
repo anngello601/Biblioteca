@@ -21,114 +21,116 @@
             </div>
           }
 
-          <!-- ==================== AVATAR ==================== -->
-          <div class="text-center mb-4">
+          <!-- ✅ AQUÍ EMPIEZA EL FORM -->
+          <form (ngSubmit)="guardarPerfil()">
 
-            <div class="avatar-wrapper position-relative d-inline-block"
-                 (dragover)="onDragOver($event)"
-                 (dragleave)="onDragLeave($event)"
-                 (drop)="onDrop($event)">
+            <!-- ==================== AVATAR ==================== -->
+            <div class="text-center mb-4">
+              <div class="avatar-wrapper position-relative d-inline-block"
+                   (dragover)="onDragOver($event)"
+                   (dragleave)="onDragLeave($event)"
+                   (drop)="onDrop($event)">
 
-              <img [src]="avatarPreview()"
-                   class="rounded-circle border shadow-sm avatar-img"
-                   width="140" height="140"
-                   alt="Avatar">
+                <img [src]="avatarPreview()"
+                     class="rounded-circle border shadow-sm avatar-img"
+                     width="140" height="140"
+                     alt="Avatar">
 
-              <!-- Overlay que se ve al pasar el mouse -->
-              <label for="avatarInput"
-                     class="avatar-overlay"
-                     title="Cambiar foto">
-                <span class="material-symbols-outlined">photo_camera</span>
-                <span class="avatar-overlay-text">Cambiar foto</span>
-              </label>
+                <label for="avatarInput"
+                       class="avatar-overlay"
+                       title="Cambiar foto">
+                  <span class="material-symbols-outlined">photo_camera</span>
+                  <span class="avatar-overlay-text">Cambiar foto</span>
+                </label>
 
-              <!-- Input oculto — se dispara al hacer click en el label -->
-              <input id="avatarInput"
-                     #fileInput
-                     type="file"
-                     accept="image/*"
-                     hidden
-                     (change)="onFileSelected($event)">
+                <input id="avatarInput"
+                       #fileInput
+                       type="file"
+                       accept="image/*"
+                       hidden
+                       (change)="onFileSelected($event)">
+              </div>
+
+              <p class="text-muted small mt-3 mb-0">
+                Haz clic en la foto o arrastra una imagen aquí.
+                <br>Formatos: JPG, PNG, WEBP · Máx. 10 MB
+              </p>
             </div>
 
-            <p class="text-muted small mt-3 mb-0">
-              Haz clic en la foto o arrastra una imagen aquí.
-              <br>Formatos: JPG, PNG, WEBP · Máx. 10 MB
-            </p>
-          </div>
+            <!-- ==================== OPCIÓN URL ==================== -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">O pega una URL de imagen</label>
+              <div class="input-group">
+                <input type="url"
+                       class="form-control"
+                       [(ngModel)]="avatarUrl"
+                       name="avatarUrl"
+                       placeholder="https://ejemplo.com/foto.jpg"
+                       [disabled]="!!selectedFile">
+                <button class="btn btn-outline-secondary"
+                        type="button"
+                        (click)="previsualizarUrl()"
+                        [disabled]="!!selectedFile">
+                  <i class="fas fa-eye me-1"></i> Previsualizar
+                </button>
+              </div>
+              @if (selectedFile) {
+                <small class="text-success">
+                  <i class="fas fa-check me-1"></i>
+                  Archivo seleccionado: {{ selectedFile.name }}
+                  (la URL se ignora)
+                </small>
+              } @else {
+                <small class="text-muted">
+                  Si subes un archivo, se ignora esta URL.
+                </small>
+              }
+            </div>
 
-          <!-- ==================== OPCIÓN URL ==================== -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">O pega una URL de imagen</label>
-            <div class="input-group">
-              <input type="url"
+            <!-- ==================== NOMBRE ==================== -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Nombre completo</label>
+              <input type="text"
                      class="form-control"
-                     [(ngModel)]="avatarUrl"
-                     name="avatarUrl"
-                     placeholder="https://ejemplo.com/foto.jpg"
-                     [disabled]="!!selectedFile">
-              <button class="btn btn-outline-secondary"
-                      type="button"
-                      (click)="previsualizarUrl()"
-                      [disabled]="!!selectedFile">
-                <i class="fas fa-eye me-1"></i> Previsualizar
+                     [(ngModel)]="nombre"
+                     name="nombre"
+                     required>
+            </div>
+
+            <!-- ==================== PASSWORD ==================== -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">
+                Nueva contraseña
+                <span class="text-muted small">(opcional)</span>
+              </label>
+              <input type="password"
+                     class="form-control"
+                     [(ngModel)]="password"
+                     name="password"
+                     placeholder="Dejar en blanco para no cambiarla"
+                     minlength="6">
+            </div>
+
+            <!-- ==================== BOTONES ==================== -->
+            <div class="d-flex gap-3 mt-4">
+              <button type="submit"
+                      class="btn btn-primary btn-lg flex-grow-1"
+                      [disabled]="cargando()">
+                @if (cargando()) {
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                }
+                {{ cargando() ? 'Guardando...' : 'Guardar cambios' }}
+              </button>
+              <button type="button"
+                      class="btn btn-outline-secondary btn-lg"
+                      (click)="cancelar()"
+                      [disabled]="cargando()">
+                Cancelar
               </button>
             </div>
-            @if (selectedFile) {
-              <small class="text-success">
-                <i class="fas fa-check me-1"></i>
-                Archivo seleccionado: {{ selectedFile.name }}
-                (la URL se ignora)
-              </small>
-            } @else {
-              <small class="text-muted">
-                Si subes un archivo, se ignora esta URL.
-              </small>
-            }
-          </div>
 
-          <!-- ==================== NOMBRE ==================== -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Nombre completo</label>
-            <input type="text"
-                   class="form-control"
-                   [(ngModel)]="nombre"
-                   name="nombre"
-                   required>
-          </div>
-
-          <!-- ==================== PASSWORD ==================== -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">
-              Nueva contraseña
-              <span class="text-muted small">(opcional)</span>
-            </label>
-            <input type="password"
-                   class="form-control"
-                   [(ngModel)]="password"
-                   name="password"
-                   placeholder="Dejar en blanco para no cambiarla"
-                   minlength="6">
-          </div>
-
-          <!-- ==================== BOTONES ==================== -->
-          <div class="d-flex gap-3 mt-4">
-            <button type="button"
-                    class="btn btn-primary btn-lg flex-grow-1"
-                    (click)="guardarPerfil()"
-                    [disabled]="cargando()">
-              @if (cargando()) {
-                <span class="spinner-border spinner-border-sm me-2"></span>
-              }
-              {{ cargando() ? 'Guardando...' : 'Guardar cambios' }}
-            </button>
-            <button type="button"
-                    class="btn btn-outline-secondary btn-lg"
-                    (click)="cancelar()"
-                    [disabled]="cargando()">
-              Cancelar
-            </button>
-          </div>
+          </form>
+          <!-- ✅ AQUÍ TERMINA EL FORM -->
 
         </div>
       </div>

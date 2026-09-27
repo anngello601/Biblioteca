@@ -3,6 +3,7 @@ package com.example.Biblioteca.controller;
 import com.example.Biblioteca.entity.Usuario;
 import com.example.Biblioteca.service.UsuarioService;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j; // <-- NUEVO IMPORT
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j // <-- NUEVA ANOTACIÓN PARA LOGS
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
@@ -111,7 +113,8 @@ public class UsuarioRestController {
                 usuario.setAvatarUrl(avatarUrl.trim());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            // CAMBIO AQUÍ: Reemplazamos e.printStackTrace() por un log robusto
+            log.error("Error al subir la imagen a Supabase: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al subir la imagen: " + e.getMessage());
         }
@@ -151,14 +154,4 @@ public class UsuarioRestController {
 
         return supabaseUrl + "/storage/v1/object/public/" + supabaseBucket + "/" + filename;
     }
-}
-
-// ============ DTO LOGIN ============
-class LoginRequest {
-    private String email;
-    private String password;
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
 }
