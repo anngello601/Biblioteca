@@ -260,3 +260,47 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: 80px;
 }
+
+/* Quitar subrayado de los enlaces personalizados del navbar */
+.cart-btn,
+.user-trigger,
+.icon-btn {
+  text-decoration: none;
+  color: inherit;
+}
+
+.cart-btn:hover,
+.user-trigger:hover {
+  text-decoration: none;
+}
+
+/* Estilo del texto "Carrito" y del nombre de usuario */
+.cart-btn .nav-link-text,
+.user-trigger .user-name {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #374151;
+  transition: color 0.2s ease;
+}
+
+.cart-btn:hover .nav-link-text {
+  color: #0d6efd;
+}
+
+.user-trigger:hover .user-name {
+  color: #0d6efd;
+}
+
+/* Que el ícono de favoritos se vea consistente */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.icon-btn:hover {
+  background-color: rgba(13, 110, 253, 0.08);
+}
