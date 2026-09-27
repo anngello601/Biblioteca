@@ -23,7 +23,9 @@ export class NavbarComponent {
   cantidadCarrito = computed(() => this.itemsCarrito());
   nombreMostrar = computed(() => this.usuario()?.nombre ?? '');
   avatarUrl = computed(
-    () => this.usuario()?.avatarUrl || 'https://i.ibb.co/nM8GvScD/pngwing-com.png',
+    () =>
+      this.usuario()?.avatarUrl ||
+      'https://www.nicepng.com/png/detail/115-1150821_default-avatar-comments-sign-in-icon-png.png',
   );
 
   toggleDropdown(event?: Event) {

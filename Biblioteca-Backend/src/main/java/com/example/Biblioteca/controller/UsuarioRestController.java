@@ -20,7 +20,7 @@ import java.util.Map;
 public class UsuarioRestController {
 
     private static final String DEFAULT_AVATAR_URL =
-            "https://i.ibb.co/nM8GvScD/pngwing-com.png";
+            "https://www.nicepng.com/png/detail/115-1150821_default-avatar-comments-sign-in-icon-png.png";
 
     private final UsuarioService usuarioService;
 
@@ -131,8 +131,8 @@ public class UsuarioRestController {
         byte[] bytes = avatar.getBytes();
         String base64Image = Base64.getEncoder().encodeToString(bytes);
 
-        String apiKey = "ebdfcf611aff24c4ecbf9b0afe1e4154";
-        String url = "https://api.imgbb.com/1/upload?key=" + apiKey + "&album=8zxhD0";
+        String url = "https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY
+                + "&album=" + IMGBB_ALBUM;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -140,16 +140,13 @@ public class UsuarioRestController {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("image", base64Image);
 
-        HttpEntity<MultiValueMap<String, String>> requestEntity =
-                new HttpEntity<>(body, headers);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Map> response =
-                restTemplate.postForEntity(url, requestEntity, Map.class);
+        ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
 
-        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-            Map<String, Object> data =
-                    (Map<String, Object>) response.getBody().get("data");
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            Map<String, Object> data = (Map<String, Object>) response.getBody().get("data");
             return (String) data.get("url");
         }
         throw new RuntimeException("ImgBB respondió " + response.getStatusCode());

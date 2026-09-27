@@ -18,7 +18,8 @@ export class PerfilComponent {
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
-  readonly defaultAvatarUrl = 'https://i.ibb.co/nM8GvScD/pngwing-com.png';
+  readonly defaultAvatarUrl =
+    'https://www.nicepng.com/png/detail/115-1150821_default-avatar-comments-sign-in-icon-png.png';
 
   // Datos del formulario
   nombre = '';

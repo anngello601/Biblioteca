@@ -12,7 +12,7 @@ import lombok.*;
 public class Usuario {
 
     public static final String AVATAR_DEFAULT =
-            "https://i.ibb.co/nM8GvScD/pngwing-com.png";
+            "https://www.nicepng.com/png/detail/115-1150821_default-avatar-comments-sign-in-icon-png.png";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
