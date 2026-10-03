@@ -1,11 +1,17 @@
 package com.example.Biblioteca.controller;
 
 import com.example.Biblioteca.entity.Usuario;
+import com.example.Biblioteca.security.JwtService;
 import com.example.Biblioteca.service.UsuarioService;
-import jakarta.servlet.http.HttpSession;
-import lombok.extern.slf4j.Slf4j; // <-- NUEVO IMPORT
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,10 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j // <-- NUEVA ANOTACIÓN PARA LOGS
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class UsuarioRestController {
 
     private static final String DEFAULT_AVATAR_URL =
@@ -32,9 +37,19 @@ public class UsuarioRestController {
     private String supabaseBucket;
 
     private final UsuarioService usuarioService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioRestController(UsuarioService usuarioService) {
+    public UsuarioRestController(
+            UsuarioService usuarioService,
+            AuthenticationManager authenticationManager,
+            JwtService jwtService,
+            PasswordEncoder passwordEncoder) {
         this.usuarioService = usuarioService;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     private void asegurarAvatar(Usuario u) {
@@ -45,40 +60,43 @@ public class UsuarioRestController {
 
     // ============ LOGIN ============
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpSession session) {
-        Usuario usuario = usuarioService.login(request.getEmail(), request.getPassword());
-        if (usuario != null) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+            Usuario usuario = usuarioService.obtenerPorEmail(authentication.getName());
             asegurarAvatar(usuario);
-            session.setAttribute("usuario", usuario);
-            return ResponseEntity.ok(usuario);
+            String token = jwtService.generateToken((UserDetails) authentication.getPrincipal());
+            return ResponseEntity.ok(new LoginResponse(token, usuario));
+        } catch (BadCredentialsException exception) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
     }
 
     // ============ REGISTRO ============
     @PostMapping("/registro")
     public ResponseEntity<?> registro(@RequestBody Usuario usuario) {
-        Usuario nuevo = usuarioService.registrar(usuario);
-        asegurarAvatar(nuevo);
-        return ResponseEntity.ok(nuevo);
+        try {
+            Usuario nuevo = usuarioService.registrar(usuario);
+            asegurarAvatar(nuevo);
+            return ResponseEntity.ok(nuevo);
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().body(exception.getMessage());
+        }
     }
 
     // ============ LOGOUT ============
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpSession session) {
-        session.invalidate();
+    public ResponseEntity<?> logout() {
         return ResponseEntity.ok().build();
     }
 
     // ============ USUARIO ACTUAL ============
     @GetMapping("/usuario")
-    public ResponseEntity<?> getUsuario(HttpSession session) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario != null) {
-            asegurarAvatar(usuario);
-            return ResponseEntity.ok(usuario);
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    public ResponseEntity<Usuario> getUsuario(Authentication authentication) {
+        Usuario usuario = usuarioService.obtenerPorEmail(authentication.getName());
+        asegurarAvatar(usuario);
+        return ResponseEntity.ok(usuario);
     }
 
     // ============ LISTAR ============
@@ -96,15 +114,14 @@ public class UsuarioRestController {
             @RequestParam(value = "password", required = false) String password,
             @RequestParam(value = "avatarUrl", required = false) String avatarUrl,
             @RequestParam(value = "avatar", required = false) MultipartFile avatar,
-            HttpSession session) {
+            Authentication authentication) {
 
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
-        }
+        Usuario usuario = usuarioService.obtenerPorEmail(authentication.getName());
 
         if (nombre != null && !nombre.isBlank()) usuario.setNombre(nombre.trim());
-        if (password != null && !password.isBlank()) usuario.setPassword(password);
+        if (password != null && !password.isBlank()) {
+            usuario.setPassword(passwordEncoder.encode(password));
+        }
 
         try {
             if (avatar != null && !avatar.isEmpty()) {
@@ -121,7 +138,6 @@ public class UsuarioRestController {
 
         asegurarAvatar(usuario);
         usuarioService.actualizar(usuario);
-        session.setAttribute("usuario", usuario);
 
         return ResponseEntity.ok(usuario);
     }

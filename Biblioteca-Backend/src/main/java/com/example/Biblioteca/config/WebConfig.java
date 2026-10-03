@@ -11,7 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/api/**")
                 .allowedOrigins("http://localhost:4200", "https://biblioteca2-yh8o.onrender.com")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowCredentials(true) // 👈 ESTO ES CRUCIAL
-                .allowedHeaders("*");
+                .allowCredentials(true)
+                .allowedHeaders("Authorization", "Content-Type");
     }
 }

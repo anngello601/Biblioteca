@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/carrito")
-@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class CarritoRestController {
 
     private final CarritoService carritoService;

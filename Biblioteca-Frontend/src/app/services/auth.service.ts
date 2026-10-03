@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { Usuario } from '../models/usuario.model';
 import { environment } from '../../environments/environment'; // 👈 sin .prod
 
@@ -20,22 +20,26 @@ export class AuthService {
 
   login(email: string, password: string): Observable<Usuario> {
     return this.http
-      .post<Usuario>(`${this.apiUrl}/login`, { email, password }, { withCredentials: true })
-      .pipe(tap((usuario) => this.setUsuario(usuario)));
+      .post<{ token: string; usuario: Usuario }>(`${this.apiUrl}/login`, { email, password })
+      .pipe(
+        tap((response) => localStorage.setItem('token', response.token)),
+        map((response) => response.usuario),
+        tap((usuario) => this.setUsuario(usuario)),
+      );
   }
 
   registro(usuario: Usuario): Observable<Usuario> {
-    return this.http.post<Usuario>(`${this.apiUrl}/registro`, usuario, { withCredentials: true });
+    return this.http.post<Usuario>(`${this.apiUrl}/registro`, usuario);
   }
 
   logout(): Observable<void> {
     return this.http
-      .post<void>(`${this.apiUrl}/logout`, {}, { withCredentials: true })
-      .pipe(tap(() => this.setUsuario(null)));
+      .post<void>(`${this.apiUrl}/logout`, {})
+      .pipe(tap(() => this.cerrarSesionLocal()));
   }
 
   getUsuarioActual(): Observable<Usuario | null> {
-    return this.http.get<Usuario>(`${this.apiUrl}/usuario`, { withCredentials: true }).pipe(
+    return this.http.get<Usuario>(`${this.apiUrl}/usuario`).pipe(
       tap({
         next: (u) => this.setUsuario(u),
         error: () => this.setUsuario(null),
@@ -45,8 +49,13 @@ export class AuthService {
 
   actualizarPerfil(formData: FormData): Observable<Usuario> {
     return this.http
-      .put<Usuario>(`${this.apiUrl}/perfil`, formData, { withCredentials: true })
+      .put<Usuario>(`${this.apiUrl}/perfil`, formData)
       .pipe(tap((usuario) => this.setUsuario(usuario)));
+  }
+
+  private cerrarSesionLocal(): void {
+    localStorage.removeItem('token');
+    this.setUsuario(null);
   }
 
   // Métodos auxiliares privados
