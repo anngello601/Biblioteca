@@ -3,8 +3,12 @@ package com.example.Biblioteca.controller;
 import com.example.Biblioteca.entity.Usuario;
 import com.example.Biblioteca.service.UsuarioService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +25,19 @@ public class UsuarioRestController {
     private static final String DEFAULT_AVATAR_URL = "https://i.ibb.co/nM8GvScD/pngwing-com.png";
 
     private final UsuarioService usuarioService;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioRestController(UsuarioService usuarioService) {
+    // 🔐 API key leída desde application.properties
+    @Value("${imgbb.api.key}")
+    private String imgbbApiKey;
+
+    @Value("${imgbb.album.id:}")
+    private String imgbbAlbumId;
+
+    public UsuarioRestController(UsuarioService usuarioService,
+                                 PasswordEncoder passwordEncoder) {
         this.usuarioService = usuarioService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     private void asegurarAvatar(Usuario usuario) {
@@ -44,11 +58,13 @@ public class UsuarioRestController {
     }
 
     @PostMapping("/registro")
-    public ResponseEntity<?> registro(@RequestBody Usuario usuario) {
-        Usuario nuevo = usuarioService.registrar(usuario);
-        asegurarAvatar(nuevo);
-        return ResponseEntity.ok(nuevo);
+
+    public ResponseEntity<?> registro(@Valid @RequestBody Usuario usuario) {
+    Usuario nuevo = usuarioService.registrar(usuario);
+    asegurarAvatar(nuevo);
+    return ResponseEntity.ok(nuevo);
     }
+ 
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpSession session) {
@@ -90,21 +106,21 @@ public class UsuarioRestController {
 
         usuario.setNombre(nombre);
 
+        //Hashear nueva contraseña si viene
         if (password != null && !password.isEmpty()) {
-            usuario.setPassword(password);
+            usuario.setPassword(passwordEncoder.encode(password));
         }
 
-        // 🎯 LÓGICA DE AVATAR CON PRIORIDAD:
-        // 1) Si hay archivo → subir a ImgBB y usar esa URL.
-        // 2) Si no hay archivo pero sí avatarUrl → usar esa URL directamente.
-        // 3) Si no hay ninguno → mantener la actual (no tocar).
+        // Lógica de avatar: archivo > URL > mantener actual
         if (avatar != null && !avatar.isEmpty()) {
             try {
                 byte[] bytes = avatar.getBytes();
                 String base64Image = Base64.getEncoder().encodeToString(bytes);
 
-                String apiKey = "ebdfcf611aff24c4ecbf9b0afe1e4154";
-                String url = "https://api.imgbb.com/1/upload?key=" + apiKey + "&album=8zxhD0";
+                String url = "https://api.imgbb.com/1/upload?key=" + imgbbApiKey;
+                if (imgbbAlbumId != null && !imgbbAlbumId.isEmpty()) {
+                    url += "&album=" + imgbbAlbumId;
+                }
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -130,10 +146,8 @@ public class UsuarioRestController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar la imagen");
             }
         } else if (avatarUrl != null && !avatarUrl.trim().isEmpty()) {
-            // ✅ FIX: actualizar la URL directamente si viene por texto
             usuario.setAvatarUrl(avatarUrl.trim());
         }
-        // Si ninguno viene, se mantiene el avatar actual.
 
         usuarioService.actualizar(usuario);
         session.setAttribute("usuario", usuario);

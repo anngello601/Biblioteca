@@ -17,21 +17,26 @@ export class RegistroComponent {
     nombre: '',
     email: '',
     password: '',
-    rol: 'CLIENTE'   // 🆕 valor por defecto
+    rol: 'CLIENTE'
   };
   confirmPassword = '';
   error = '';
+  erroresCampos: { [key: string]: string } = {}; //  errores por campo
   loading = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
+    this.error = '';
+    this.erroresCampos = {};
+
+    // Validación local: contraseñas coinciden
     if (this.usuario.password !== this.confirmPassword) {
       this.error = 'Las contraseñas no coinciden';
       return;
     }
+
     this.loading = true;
-    this.error = '';
     this.authService.registro(this.usuario).subscribe({
       next: () => {
         this.loading = false;
@@ -39,7 +44,21 @@ export class RegistroComponent {
       },
       error: (err) => {
         this.loading = false;
-        this.error = err.error?.error || err.error || 'Error al registrarse';
+
+        if (err.error?.errores) {
+          this.erroresCampos = err.error.errores;
+          this.error = 'Por favor, corrige los errores del formulario.';
+        }
+        else if (err.error?.error) {
+          this.error = err.error.error;
+        }
+        else if (typeof err.error === 'string') {
+          this.error = err.error;
+        }
+
+        else {
+          this.error = 'Error al registrarse. Intenta de nuevo.';
+        }
       }
     });
   }

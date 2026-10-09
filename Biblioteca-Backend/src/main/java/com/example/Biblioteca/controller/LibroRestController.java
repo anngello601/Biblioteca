@@ -4,6 +4,7 @@ import com.example.Biblioteca.entity.Libro;
 import com.example.Biblioteca.entity.Usuario;
 import com.example.Biblioteca.service.LibroService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +26,6 @@ public class LibroRestController {
         this.libroService = libroService;
     }
 
-    // ✅ GET con paginación, filtro por tipo y búsqueda
     @GetMapping
     public Page<Libro> listarPaginado(
             @RequestParam(defaultValue = "0") int page,
@@ -56,9 +56,9 @@ public class LibroRestController {
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado"));
     }
 
-    // 🔒 Solo ADMIN
+    // Solo ADMIN
     @PostMapping
-    public ResponseEntity<?> guardar(@RequestBody Libro libro, HttpSession session) {
+    public ResponseEntity<?> guardar(@Valid @RequestBody Libro libro, HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null || !"ADMIN".equals(usuario.getRol())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -67,10 +67,10 @@ public class LibroRestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(libroService.guardar(libro));
     }
 
-    // 🔒 Solo ADMIN
+    // Solo ADMIN
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizar(@PathVariable Long id,
-                                        @RequestBody Libro libro,
+                                        @Valid @RequestBody Libro libro,
                                         HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null || !"ADMIN".equals(usuario.getRol())) {
@@ -81,7 +81,7 @@ public class LibroRestController {
         return ResponseEntity.ok(libroService.guardar(libro));
     }
 
-    // 🔒 Solo ADMIN
+    // Solo ADMIN
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminar(@PathVariable Long id, HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
