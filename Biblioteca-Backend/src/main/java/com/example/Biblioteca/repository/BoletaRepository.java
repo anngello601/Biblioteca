@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface BoletaRepository extends JpaRepository<Boleta, Long> {
     List<Boleta> findByUsuarioId(Long usuarioId);
+    boolean existsByUsuarioId(Long usuarioId);
 }

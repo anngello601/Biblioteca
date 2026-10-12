@@ -11,6 +11,7 @@ import { adminGuard } from './guards/admin.guard';
 import { HomeComponent } from './pages/home/home.component';
 import { PerfilComponent } from './pages/perfil/perfil.component';
 import { AgregarLibroComponent } from './pages/libros/agregar-libro/agregar-libro.component';
+import { UsuariosAdminComponent } from './pages/usuarios-admin/usuarios-admin.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -26,5 +27,6 @@ export const routes: Routes = [
   { path: 'perfil', component: PerfilComponent, canActivate: [AuthGuard] },
   // 🔒 Solo ADMIN
   { path: 'agregar-libro', component: AgregarLibroComponent, canActivate: [adminGuard] },
+  { path: 'admin/usuarios', component: UsuariosAdminComponent, canActivate: [adminGuard] },
   { path: '**', redirectTo: '/home' }
 ];

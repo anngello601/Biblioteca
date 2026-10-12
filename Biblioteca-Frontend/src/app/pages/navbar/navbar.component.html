@@ -1,47 +1,52 @@
 <header class="navbar navbar-expand-lg fixed-top bg-white/95 backdrop-blur-xl shadow-sm">
   <div class="container">
-    <div class="d-flex align-items-center justify-content-between w-100 flex-wrap" style="height: 72px;">
+    <div class="navbar-content d-flex align-items-center justify-content-between w-100 flex-wrap">
       <!-- Logo -->
-      <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/">
+      <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/" (click)="cerrarMenu()">
         <img
           src="https://s3-eu-west-1.amazonaws.com/tpd/logos/68e7dc181288484ef11e270d/0x0.png"
           alt="NovaBook" height="32">
         <span class="font-serif fw-bold fs-5 text-dark">NovaBook</span>
       </a>
 
-      <!-- Toggler para móvil -->
-      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
-        aria-controls="navbarMain" aria-expanded="false">
+      <button class="navbar-toggler border-0" type="button"
+        aria-controls="navbarMain"
+        [attr.aria-expanded]="isMobileMenuOpen"
+        aria-label="Abrir o cerrar menú de navegación"
+        (click)="toggleMobileMenu()">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <!-- Menú colapsable -->
-      <div class="collapse navbar-collapse" id="navbarMain">
+      <div class="collapse navbar-collapse" id="navbarMain" [class.show]="isMobileMenuOpen">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1">
           <li class="nav-item">
             <a class="nav-link" routerLink="/home" routerLinkActive="active"
-               [routerLinkActiveOptions]="{exact: true}">Inicio</a>
+               [routerLinkActiveOptions]="{exact: true}" (click)="cerrarMenu()">Inicio</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="/libros" routerLinkActive="active">Catálogo</a>
+            <a class="nav-link" routerLink="/libros" routerLinkActive="active" (click)="cerrarMenu()">Catálogo</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="/digital" routerLinkActive="active">Digital</a>
+            <a class="nav-link" routerLink="/digital" routerLinkActive="active" (click)="cerrarMenu()">Digital</a>
           </li>
 
           <!-- 🆕 Solo ADMIN ve este botón -->
           @if (esAdmin) {
             <li class="nav-item">
               <a class="nav-link fw-bold text-primary" routerLink="/agregar-libro"
-                 routerLinkActive="active">+ Agregar Libro</a>
+                 routerLinkActive="active" (click)="cerrarMenu()">+ Agregar Libro</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-bold text-primary" routerLink="/admin/usuarios"
+                 routerLinkActive="active" (click)="cerrarMenu()">Usuarios</a>
             </li>
           }
         </ul>
 
-        <div class="d-flex align-items-center gap-3">
+        <div class="navbar-actions d-flex align-items-center gap-3">
           <!-- Carrito -->
           <a class="d-flex align-items-center gap-1 bg-light px-2 py-1 rounded-pill text-dark text-decoration-none"
-             routerLink="/carrito">
+             routerLink="/carrito" (click)="cerrarMenu()">
             <span class="material-symbols-outlined">shopping_bag</span>
             <span class="badge bg-warning text-dark rounded-pill">{{ carritoService.cantidad() }}</span>
           </a>
@@ -67,8 +72,8 @@
               }
             </div>
           } @else {
-            <a class="btn btn-outline-primary btn-sm" routerLink="/login">Iniciar sesión</a>
-            <a class="btn btn-primary btn-sm" routerLink="/registro">Registrarse</a>
+            <a class="btn btn-outline-primary btn-sm" routerLink="/login" (click)="cerrarMenu()">Iniciar sesión</a>
+            <a class="btn btn-primary btn-sm" routerLink="/registro" (click)="cerrarMenu()">Registrarse</a>
           }
         </div>
       </div>

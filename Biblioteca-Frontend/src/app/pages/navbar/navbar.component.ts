@@ -19,6 +19,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   usuario: Usuario | null = null;
   isDropdownOpen = false;
+  isMobileMenuOpen = false;
 
   readonly defaultAvatarUrl = '/avatar-placeholder.svg';
 
@@ -52,12 +53,33 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
 
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    if (!this.isMobileMenuOpen) {
+      this.isDropdownOpen = false;
+    }
+  }
+
+  cerrarMenu() {
+    this.isMobileMenuOpen = false;
+    this.isDropdownOpen = false;
+  }
+
   @HostListener('document:click', ['$event'])
   clickOut(event: MouseEvent) {
     const target = event.target as HTMLElement;
+    if (!target.closest('.navbar')) {
+      this.cerrarMenu();
+      return;
+    }
     if (!target.closest('.user-menu-container')) {
       this.isDropdownOpen = false;
     }
+  }
+
+  @HostListener('document:keydown.escape')
+  cerrarConEscape() {
+    this.cerrarMenu();
   }
 
   irAPerfil() {
