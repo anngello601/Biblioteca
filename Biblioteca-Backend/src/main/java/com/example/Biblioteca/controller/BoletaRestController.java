@@ -34,13 +34,13 @@ public class BoletaRestController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("error", "Debes iniciar sesión"));
             }
-            if (carritoService.getItems().isEmpty()) {
+            if (carritoService.getItems(usuario.getId()).isEmpty()) {
                 return ResponseEntity.badRequest()
                         .body(Map.of("error", "El carrito está vacío"));
             }
 
-            Boleta boleta = boletaService.generarBoleta(usuario, carritoService.getItems());
-            carritoService.vaciar();
+            Boleta boleta = boletaService.generarBoleta(usuario, carritoService.getItems(usuario.getId()));
+            carritoService.vaciar(usuario.getId());
 
             // Devolver DTO simple en vez de la entidad (evita LazyInitializationException)
             return ResponseEntity.ok(construirBoletaDTO(boleta));

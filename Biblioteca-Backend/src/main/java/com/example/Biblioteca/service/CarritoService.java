@@ -3,23 +3,22 @@ package com.example.Biblioteca.service;
 import com.example.Biblioteca.entity.Libro;
 import com.example.Biblioteca.repository.LibroRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.SessionScope;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Service
-@SessionScope
 public class CarritoService {
 
-    private final Map<Long, Integer> items = new LinkedHashMap<>();
+    private final Map<Long, Map<Long, Integer>> carritosPorUsuario = new HashMap<>();
     private final LibroRepository libroRepository;
 
     public CarritoService(LibroRepository libroRepository) {
         this.libroRepository = libroRepository;
     }
 
-    public void agregar(Long libroId, int cantidad) {
+    public synchronized void agregar(Long usuarioId, Long libroId, int cantidad) {
         if (cantidad <= 0) {
             throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
         }
@@ -33,6 +32,7 @@ public class CarritoService {
             stockActual = 0;
         }
 
+        Map<Long, Integer> items = carritosPorUsuario.computeIfAbsent(usuarioId, ignored -> new LinkedHashMap<>());
         int cantidadActual = items.getOrDefault(libroId, 0);
         int nuevaCantidad = cantidadActual + cantidad;
 
@@ -45,23 +45,32 @@ public class CarritoService {
         items.put(libroId, nuevaCantidad);
     }
 
-    public void eliminar(Long libroId) {
-        items.remove(libroId);
+    public synchronized void eliminar(Long usuarioId, Long libroId) {
+        Map<Long, Integer> items = carritosPorUsuario.get(usuarioId);
+        if (items != null) {
+            items.remove(libroId);
+            if (items.isEmpty()) {
+                carritosPorUsuario.remove(usuarioId);
+            }
+        }
     }
 
-    public void vaciar() {
-        items.clear();
+    public synchronized void vaciar(Long usuarioId) {
+        carritosPorUsuario.remove(usuarioId);
     }
 
-    public Map<Long, Integer> getItems() {
-        return new LinkedHashMap<>(items);
+    public synchronized Map<Long, Integer> getItems(Long usuarioId) {
+        Map<Long, Integer> items = carritosPorUsuario.get(usuarioId);
+        return items == null ? new LinkedHashMap<>() : new LinkedHashMap<>(items);
     }
 
-    public int getCantidadTotal() {
-        return items.values().stream().mapToInt(Integer::intValue).sum();
+    public synchronized int getCantidadTotal(Long usuarioId) {
+        Map<Long, Integer> items = carritosPorUsuario.get(usuarioId);
+        return items == null ? 0 : items.values().stream().mapToInt(Integer::intValue).sum();
     }
 
-    public boolean estaVacio() {
-        return items.isEmpty();
+    public synchronized boolean estaVacio(Long usuarioId) {
+        Map<Long, Integer> items = carritosPorUsuario.get(usuarioId);
+        return items == null || items.isEmpty();
     }
 }

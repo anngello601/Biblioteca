@@ -1,8 +1,10 @@
 package com.example.Biblioteca.controller;
 
 import com.example.Biblioteca.entity.Libro;
+import com.example.Biblioteca.entity.Usuario;
 import com.example.Biblioteca.service.CarritoService;
 import com.example.Biblioteca.service.LibroService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,17 +26,21 @@ public class CarritoRestController {
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> verCarrito() {
-        return ResponseEntity.ok(construirRespuesta());
+    public ResponseEntity<?> verCarrito(
+            @RequestAttribute(name = "authenticatedUser", required = false) Usuario usuario) {
+        if (usuario == null) return noAutorizado();
+        return ResponseEntity.ok(construirRespuesta(usuario.getId()));
     }
 
     @PostMapping("/agregar/{id}")
     public ResponseEntity<?> agregar(
             @PathVariable Long id,
-            @RequestParam(defaultValue = "1") int cantidad) {
+            @RequestParam(defaultValue = "1") int cantidad,
+            @RequestAttribute(name = "authenticatedUser", required = false) Usuario usuario) {
+        if (usuario == null) return noAutorizado();
         try {
-            carritoService.agregar(id, cantidad);
-            return ResponseEntity.ok(construirRespuesta());
+            carritoService.agregar(usuario.getId(), id, cantidad);
+            return ResponseEntity.ok(construirRespuesta(usuario.getId()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (IllegalStateException e) {
@@ -48,24 +54,31 @@ public class CarritoRestController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> eliminar(@PathVariable Long id) {
-        carritoService.eliminar(id);
-        return ResponseEntity.ok(construirRespuesta());
+    public ResponseEntity<?> eliminar(
+            @PathVariable Long id,
+            @RequestAttribute(name = "authenticatedUser", required = false) Usuario usuario) {
+        if (usuario == null) return noAutorizado();
+        carritoService.eliminar(usuario.getId(), id);
+        return ResponseEntity.ok(construirRespuesta(usuario.getId()));
     }
 
     @DeleteMapping("/vaciar")
-    public ResponseEntity<Map<String, Object>> vaciar() {
-        carritoService.vaciar();
-        return ResponseEntity.ok(construirRespuesta());
+    public ResponseEntity<?> vaciar(
+            @RequestAttribute(name = "authenticatedUser", required = false) Usuario usuario) {
+        if (usuario == null) return noAutorizado();
+        carritoService.vaciar(usuario.getId());
+        return ResponseEntity.ok(construirRespuesta(usuario.getId()));
     }
 
     @GetMapping("/cantidad")
-    public ResponseEntity<Integer> cantidad() {
-        return ResponseEntity.ok(carritoService.getCantidadTotal());
+    public ResponseEntity<?> cantidad(
+            @RequestAttribute(name = "authenticatedUser", required = false) Usuario usuario) {
+        if (usuario == null) return noAutorizado();
+        return ResponseEntity.ok(carritoService.getCantidadTotal(usuario.getId()));
     }
 
-    private Map<String, Object> construirRespuesta() {
-        Map<Long, Integer> items = carritoService.getItems();
+    private Map<String, Object> construirRespuesta(Long usuarioId) {
+        Map<Long, Integer> items = carritoService.getItems(usuarioId);
         List<Map<String, Object>> detalles = new ArrayList<>();
         double total = 0;
 
@@ -88,7 +101,12 @@ public class CarritoRestController {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("items", detalles);
         response.put("total", total);
-        response.put("cantidadTotal", carritoService.getCantidadTotal());
+        response.put("cantidadTotal", carritoService.getCantidadTotal(usuarioId));
         return response;
+    }
+
+    private ResponseEntity<Map<String, String>> noAutorizado() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", "Debes iniciar sesión para usar el carrito"));
     }
 }

@@ -29,6 +29,14 @@
           <li class="nav-item">
             <a class="nav-link" routerLink="/digital" routerLinkActive="active" (click)="cerrarMenu()">Digital</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center gap-2" routerLink="/carrito"
+               routerLinkActive="active" (click)="cerrarMenu()">
+              <span class="material-symbols-outlined">shopping_bag</span>
+              <span>Carrito</span>
+              <span class="badge bg-warning text-dark rounded-pill">{{ carritoService.cantidad() }}</span>
+            </a>
+          </li>
 
           <!-- 🆕 Solo ADMIN ve este botón -->
           @if (esAdmin) {
@@ -44,13 +52,6 @@
         </ul>
 
         <div class="navbar-actions d-flex align-items-center gap-3">
-          <!-- Carrito -->
-          <a class="d-flex align-items-center gap-1 bg-light px-2 py-1 rounded-pill text-dark text-decoration-none"
-             routerLink="/carrito" (click)="cerrarMenu()">
-            <span class="material-symbols-outlined">shopping_bag</span>
-            <span class="badge bg-warning text-dark rounded-pill">{{ carritoService.cantidad() }}</span>
-          </a>
-
           <!-- Perfil / Login -->
           @if (usuario) {
             <div class="position-relative user-menu-container">
