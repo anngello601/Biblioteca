@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class LibroService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/libros`; 
+  private apiUrl = `${environment.apiUrl}/libros`;
 
   // 📚 Método usado por "listado" y "home" (retorna un objeto Page de Spring Boot)
   listarPaginado(page: number = 0, size: number = 12, tipo?: string, search?: string): Observable<any> {

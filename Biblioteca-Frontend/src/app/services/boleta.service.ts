@@ -6,8 +6,8 @@ import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class BoletaService {
-  private apiUrl = `${environment.apiUrl}/checkout`; 
-  
+  private apiUrl = `${environment.apiUrl}/checkout`;
+
 
   constructor(private http: HttpClient) {}
 

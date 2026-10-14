@@ -1,0 +1,94 @@
+<main class="container mt-5 pt-5">
+  <h2 class="mb-4">Administrar usuarios</h2>
+
+  @if (mensaje()) {
+    <div class="alert alert-success" role="status">{{ mensaje() }}</div>
+  }
+  @if (error()) {
+    <div class="alert alert-danger" role="alert">{{ error() }}</div>
+  }
+
+  <section class="card shadow-sm p-4 mb-5">
+    <h3 class="h5 mb-3">{{ editandoId() === null ? 'Crear usuario' : 'Editar usuario' }}</h3>
+    <form (ngSubmit)="guardar()">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label for="nombreUsuario" class="form-label">Nombre</label>
+          <input id="nombreUsuario" class="form-control" name="nombre" [(ngModel)]="formulario.nombre"
+                 minlength="2" maxlength="100" required>
+        </div>
+        <div class="col-md-4">
+          <label for="emailUsuario" class="form-label">Email</label>
+          <input id="emailUsuario" class="form-control" type="email" name="email" [(ngModel)]="formulario.email"
+                 maxlength="254" required>
+        </div>
+        <div class="col-md-4">
+          <label for="rolUsuario" class="form-label">Rol</label>
+          <select id="rolUsuario" class="form-select" name="rol" [(ngModel)]="formulario.rol" required>
+            <option value="CLIENTE">Cliente</option>
+            <option value="ADMIN">Administrador</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label for="passwordUsuario" class="form-label">
+            Contraseña {{ editandoId() === null ? '' : '(dejar vacía para mantenerla)' }}
+          </label>
+          <input id="passwordUsuario" class="form-control" type="password" name="password"
+                 [(ngModel)]="formulario.password" minlength="6" maxlength="100"
+                 [required]="editandoId() === null">
+        </div>
+      </div>
+      <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary" [disabled]="cargando()">
+          {{ editandoId() === null ? 'Crear usuario' : 'Guardar cambios' }}
+        </button>
+        @if (editandoId() !== null) {
+          <button type="button" class="btn btn-outline-secondary" (click)="limpiarFormulario()">Cancelar</button>
+        }
+      </div>
+    </form>
+  </section>
+
+  <div class="input-group mb-3" style="max-width: 440px">
+    <span class="input-group-text" aria-hidden="true">Buscar</span>
+    <input class="form-control" name="busqueda" [(ngModel)]="busqueda"
+           placeholder="Nombre, email o rol">
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (usuario of usuariosFiltrados; track usuario.id) {
+          <tr>
+            <td>{{ usuario.nombre }}</td>
+            <td>{{ usuario.email }}</td>
+            <td>
+              <span class="badge" [ngClass]="usuario.rol === 'ADMIN' ? 'bg-primary' : 'bg-secondary'">
+                {{ usuario.rol }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary me-2" type="button" (click)="editar(usuario)">Editar</button>
+              <button class="btn btn-sm btn-outline-danger" type="button"
+                      [disabled]="usuario.id === administradorId"
+                      [title]="usuario.id === administradorId ? 'No puedes eliminar tu propia cuenta' : 'Eliminar usuario'"
+                      (click)="eliminar(usuario)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="4" class="text-center text-muted py-4">No hay usuarios para mostrar.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</main>
