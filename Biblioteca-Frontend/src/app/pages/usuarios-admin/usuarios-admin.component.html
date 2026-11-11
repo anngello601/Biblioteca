@@ -34,8 +34,22 @@
             Contraseña {{ editandoId() === null ? '' : '(dejar vacía para mantenerla)' }}
           </label>
           <input id="passwordUsuario" class="form-control" type="password" name="password"
-                 [(ngModel)]="formulario.password" minlength="6" maxlength="100"
+                 [(ngModel)]="formulario.password" maxlength="100" autocomplete="new-password"
                  [required]="editandoId() === null">
+          @if (requiereValidacionPassword) {
+            <ul id="password-requirements" class="password-requirements" aria-live="polite">
+              @for (regla of passwordRequirements; track regla.label) {
+                <li [class.met]="regla.cumple">
+                  <span class="requirement-icon" aria-hidden="true">{{ regla.cumple ? '✓' : '×' }}</span>
+                  {{ regla.label }}
+                </li>
+              }
+            </ul>
+            <label for="confirmarPassword" class="form-label mt-2">Confirmar contraseña</label>
+            <input id="confirmarPassword" class="form-control" type="password" name="confirmarPassword"
+                   [(ngModel)]="confirmarPassword" autocomplete="new-password"
+                   [required]="requiereValidacionPassword">
+          }
         </div>
       </div>
       <div class="mt-4 d-flex gap-2">

@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
+import { getPasswordRequirements, isPasswordValid } from '../../utils/password-validation';
 
 
 @Component({
@@ -28,6 +29,7 @@ export class PerfilComponent {
   // Estado del formulario
   nombre = '';
   password = '';
+  confirmPassword = '';
   // Para la foto
   avatarUrl = '';           // URL manual
   selectedFile: File | null = null;
@@ -38,6 +40,14 @@ export class PerfilComponent {
   mensaje = '';
   error = '';
   cargando = false;
+
+  get passwordRequirements() {
+    return getPasswordRequirements(this.password);
+  }
+
+  get cambiandoPassword(): boolean {
+    return this.password.trim() !== '';
+  }
 
   constructor() {
     // Cargar datos del usuario actual
@@ -120,6 +130,7 @@ export class PerfilComponent {
     this.error = '';
     this.mensaje = '';
     this.cargando = true;
+    const actualizaPassword = this.cambiandoPassword;
 
     // 1️⃣ Validar nombre obligatorio
     if (!this.nombre || this.nombre.trim() === '') {
@@ -129,10 +140,17 @@ export class PerfilComponent {
     }
 
     // 2️⃣ Validar contraseña (si se ingresó)
-    if (this.password && this.password.trim() !== '' && this.password.length < 6) {
-      this.error = 'La contraseña debe tener al menos 6 caracteres.';
-      this.cargando = false;
-      return;
+    if (this.password && this.password.trim() !== '') {
+      if (!isPasswordValid(this.password)) {
+        this.error = 'La contraseña no cumple todos los requisitos.';
+        this.cargando = false;
+        return;
+      }
+      if (this.password !== this.confirmPassword) {
+        this.error = 'Las contraseñas no coinciden.';
+        this.cargando = false;
+        return;
+      }
     }
 
     // 3️⃣ Crear FormData (siempre, porque el backend espera multipart/form-data)
@@ -159,12 +177,16 @@ export class PerfilComponent {
       .subscribe({
         next: (response: any) => {
           this.cargando = false;
-          this.mensaje = '✅ Perfil actualizado correctamente.';
+          this.mensaje = actualizaPassword
+            ? '✅ Perfil actualizado correctamente. Contraseña actualizada correctamente.'
+            : '✅ Perfil actualizado correctamente.';
           if (response.avatarUrl) {
             this.avatarPreview.set(response.avatarUrl);
             this.avatarUrl = response.avatarUrl;
           }
           this.selectedFile = null;
+          this.password = '';
+          this.confirmPassword = '';
           if (this.fileInput) {
             this.fileInput.nativeElement.value = '';
           }

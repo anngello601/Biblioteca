@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { Usuario } from '../../models/usuario.model';
+import { getPasswordRequirements, isPasswordValid } from '../../utils/password-validation';
 
 @Component({
   selector: 'app-registro',
@@ -23,6 +24,15 @@ export class RegistroComponent {
   error = '';
   erroresCampos: { [key: string]: string } = {}; //  errores por campo
   loading = false;
+  mostrarPassword = false;
+
+  get passwordRequirements() {
+    return getPasswordRequirements(this.usuario.password ?? '');
+  }
+
+  get passwordValida(): boolean {
+    return isPasswordValid(this.usuario.password ?? '');
+  }
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -30,7 +40,11 @@ export class RegistroComponent {
     this.error = '';
     this.erroresCampos = {};
 
-    // Validación local: contraseñas coinciden
+    if (!this.passwordValida) {
+      this.error = 'La contraseña no cumple todos los requisitos.';
+      return;
+    }
+
     if (this.usuario.password !== this.confirmPassword) {
       this.error = 'Las contraseñas no coinciden';
       return;

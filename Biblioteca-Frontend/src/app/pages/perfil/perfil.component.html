@@ -63,7 +63,21 @@
           <div class="mb-3">
             <label class="form-label fw-semibold">Nueva contraseña <span class="text-muted small">(opcional)</span></label>
             <input type="password" class="form-control" [(ngModel)]="password" name="password"
-                   placeholder="Dejar en blanco para no cambiarla" minlength="6">
+                   placeholder="Dejar en blanco para no cambiarla" autocomplete="new-password"
+                   aria-describedby="password-requirements">
+            @if (cambiandoPassword) {
+              <ul id="password-requirements" class="password-requirements" aria-live="polite">
+                @for (regla of passwordRequirements; track regla.label) {
+                  <li [class.met]="regla.cumple">
+                    <span class="requirement-icon" aria-hidden="true">{{ regla.cumple ? '✓' : '×' }}</span>
+                    {{ regla.label }}
+                  </li>
+                }
+              </ul>
+              <label class="form-label fw-semibold mt-2" for="confirmPassword">Confirmar nueva contraseña</label>
+              <input id="confirmPassword" type="password" class="form-control" [(ngModel)]="confirmPassword"
+                     name="confirmPassword" required autocomplete="new-password">
+            }
           </div>
 
           <!-- Botones -->

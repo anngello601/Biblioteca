@@ -35,12 +35,29 @@
         <!-- Contraseña -->
         <div class="mb-3">
           <label class="form-label"><i class="fas fa-lock me-1"></i> Contraseña</label>
-          <input type="password" class="form-control"
+          <div class="password-input">
+            <input [type]="mostrarPassword ? 'text' : 'password'" class="form-control"
                  [class.is-invalid]="erroresCampos['password']"
                  [(ngModel)]="usuario.password" name="password" required
-                 placeholder="Mínimo 6 caracteres" minlength="6">
+                 placeholder="Crea una contraseña segura" autocomplete="new-password"
+                 aria-describedby="password-requirements">
+            <button type="button" class="password-toggle" (click)="mostrarPassword = !mostrarPassword"
+                    [attr.aria-label]="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                    [attr.aria-pressed]="mostrarPassword">
+              <i class="fas" [class.fa-eye]="!mostrarPassword" [class.fa-eye-slash]="mostrarPassword"
+                 aria-hidden="true"></i>
+            </button>
+          </div>
+          <ul id="password-requirements" class="password-requirements" aria-live="polite">
+            @for (regla of passwordRequirements; track regla.label) {
+              <li [class.met]="regla.cumple">
+                <span class="requirement-icon" aria-hidden="true">{{ regla.cumple ? '✓' : '×' }}</span>
+                {{ regla.label }}
+              </li>
+            }
+          </ul>
           @if (erroresCampos['password']) {
-            <div class="invalid-feedback">{{ erroresCampos['password'] }}</div>
+            <div class="invalid-feedback d-block">{{ erroresCampos['password'] }}</div>
           }
         </div>
 
@@ -48,7 +65,8 @@
         <div class="mb-3">
           <label class="form-label"><i class="fas fa-check-circle me-1"></i> Confirmar contraseña</label>
           <input type="password" class="form-control" [(ngModel)]="confirmPassword"
-                 name="confirmPassword" required placeholder="Repite la contraseña">
+                 name="confirmPassword" required placeholder="Repite la contraseña"
+                 autocomplete="new-password">
         </div>
 
         <!-- Selector de rol -->

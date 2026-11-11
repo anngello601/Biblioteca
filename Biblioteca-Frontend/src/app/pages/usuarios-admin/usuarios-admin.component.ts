@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Usuario } from '../../models/usuario.model';
 import { AuthService } from '../../services/auth.service';
 import { UsuarioAdminRequest, UsuarioAdminService } from '../../services/usuario-admin.service';
+import { getPasswordRequirements, isPasswordValid } from '../../utils/password-validation';
 
 @Component({
   selector: 'app-usuarios-admin',
@@ -22,7 +23,16 @@ export class UsuariosAdminComponent implements OnInit {
   mensaje = signal('');
   busqueda = '';
   formulario: UsuarioAdminRequest = this.formularioVacio();
+  confirmarPassword = '';
   administradorId: number | undefined;
+
+  get passwordRequirements() {
+    return getPasswordRequirements(this.formulario.password ?? '');
+  }
+
+  get requiereValidacionPassword(): boolean {
+    return this.editandoId() === null || !!this.formulario.password?.trim();
+  }
 
   ngOnInit(): void {
     this.authService.usuario$.subscribe(usuario => this.administradorId = usuario?.id);
@@ -63,7 +73,18 @@ export class UsuariosAdminComponent implements OnInit {
       this.error.set('La contraseña es obligatoria para crear un usuario.');
       return;
     }
+    if (request.password) {
+      if (!isPasswordValid(request.password)) {
+        this.error.set('La contraseña no cumple todos los requisitos.');
+        return;
+      }
+      if (request.password !== this.confirmarPassword) {
+        this.error.set('Las contraseñas no coinciden.');
+        return;
+      }
+    }
 
+    const actualizaPassword = this.editandoId() !== null && !!request.password;
     this.cargando.set(true);
     const id = this.editandoId();
     const operacion = id === null
@@ -71,7 +92,11 @@ export class UsuariosAdminComponent implements OnInit {
       : this.usuarioAdminService.actualizar(id, request);
     operacion.subscribe({
       next: () => {
-        this.mensaje.set(id === null ? 'Usuario creado correctamente.' : 'Usuario actualizado correctamente.');
+        this.mensaje.set(id === null
+          ? 'Usuario creado correctamente.'
+          : actualizaPassword
+            ? 'Usuario actualizado correctamente. Contraseña actualizada correctamente.'
+            : 'Usuario actualizado correctamente.');
         this.limpiarFormulario();
         this.cargarUsuarios();
       },
@@ -90,6 +115,7 @@ export class UsuariosAdminComponent implements OnInit {
       rol: usuario.rol ?? 'CLIENTE',
       password: ''
     };
+    this.confirmarPassword = '';
     this.error.set('');
     this.mensaje.set('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -115,6 +141,7 @@ export class UsuariosAdminComponent implements OnInit {
   limpiarFormulario(): void {
     this.editandoId.set(null);
     this.formulario = this.formularioVacio();
+    this.confirmarPassword = '';
   }
 
   private formularioVacio(): UsuarioAdminRequest {
