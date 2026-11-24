@@ -1,0 +1,25 @@
+
+services:
+  backend:
+    build:
+      context: ./Biblioteca-Backend
+    container_name: biblioteca-backend
+    expose:
+      - "8080"
+    networks:
+      - biblioteca-network
+
+  frontend:
+    build:
+      context: ./Biblioteca-Frontend
+    container_name: biblioteca-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - biblioteca-network
+
+networks:
+  biblioteca-network:
+    driver: bridge
