@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Documentación académica y técnica del sistema web NovaBook Biblioteca.">
+  <title>Documentación del proyecto | NovaBook Biblioteca</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17212b;
+      --muted: #596875;
+      --brand: #087f8c;
+      --brand-dark: #075d68;
+      --paper: #ffffff;
+      --canvas: #f2f6f7;
+      --line: #dce5e8;
+      --warning: #fff3cd;
+      --warning-ink: #715400;
+      --success: #e2f5ee;
+      --success-ink: #176345;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--ink);
+      font: 16px/1.65 "Segoe UI", Arial, sans-serif;
+    }
+    a { color: var(--brand-dark); }
+    a:focus-visible, button:focus-visible { outline: 3px solid #e8a82e; outline-offset: 3px; }
+    .hero {
+      padding: 3.5rem max(1.25rem, calc((100% - 1120px) / 2));
+      background: linear-gradient(125deg, #073e4a, #087f8c 65%, #2c9c94);
+      color: white;
+    }
+    .hero-inner { max-width: 1120px; margin: auto; }
+    .eyebrow { margin: 0 0 .5rem; color: #bce7e5; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { max-width: 850px; margin: 0; font-size: clamp(2rem, 5vw, 3.45rem); line-height: 1.12; }
+    .hero p:last-child { max-width: 760px; color: #e0f1f1; font-size: 1.1rem; }
+    .layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 1.5rem; max-width: 1400px; margin: 1.5rem auto; padding: 0 1.25rem; }
+    nav {
+      position: sticky;
+      top: 1rem;
+      align-self: start;
+      max-height: calc(100vh - 2rem);
+      overflow: auto;
+      padding: 1rem;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--paper);
+    }
+    nav strong { display: block; margin: 0 0 .6rem; }
+    nav a { display: block; padding: .35rem .5rem; border-radius: 6px; font-size: .92rem; text-decoration: none; }
+    nav a:hover { background: #e9f4f4; }
+    main { min-width: 0; }
+    section, .summary-card {
+      margin-bottom: 1.25rem;
+      padding: clamp(1.1rem, 3vw, 2rem);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--paper);
+      box-shadow: 0 5px 20px rgb(21 48 59 / 4%);
+      scroll-margin-top: 1rem;
+    }
+    h2 { margin: 0 0 1rem; color: var(--brand-dark); font-size: 1.65rem; }
+    h3 { margin: 1.5rem 0 .55rem; font-size: 1.17rem; }
+    h4 { margin: 1rem 0 .35rem; }
+    p { margin: .55rem 0; }
+    .lead { color: var(--muted); font-size: 1.08rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .85rem; }
+    .card { padding: 1rem; border: 1px solid var(--line); border-radius: 10px; background: #fbfdfd; }
+    .card h3, .card h4 { margin-top: 0; }
+    .callout { margin: 1rem 0; padding: 1rem; border-left: 4px solid var(--brand); border-radius: 6px; background: #eaf5f5; }
+    .callout.warning { border-color: #d79b10; background: var(--warning); color: var(--warning-ink); }
+    .callout.success { border-color: #27835e; background: var(--success); color: var(--success-ink); }
+    .badge { display: inline-block; padding: .12rem .5rem; border-radius: 999px; background: #e5eff1; color: #244a54; font-size: .78rem; font-weight: 700; }
+    .badge.demo { background: var(--warning); color: var(--warning-ink); }
+    .badge.live { background: var(--success); color: var(--success-ink); }
+    .table-wrap { overflow-x: auto; margin: .8rem 0 1rem; }
+    table { width: 100%; border-collapse: collapse; min-width: 680px; }
+    th, td { padding: .7rem; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { background: #eaf2f4; }
+    code, pre { font-family: Consolas, "Courier New", monospace; }
+    code { overflow-wrap: anywhere; color: #174e57; }
+    pre { overflow: auto; padding: 1rem; border-radius: 8px; background: #11252c; color: #e4f2f3; }
+    .flow { display: grid; grid-template-columns: repeat(5, minmax(110px, 1fr)); gap: .5rem; align-items: stretch; margin: 1rem 0; }
+    .flow div { display: grid; place-items: center; min-height: 74px; padding: .6rem; border: 1px solid #a8c9cd; border-radius: 9px; background: #f0f8f8; text-align: center; font-weight: 700; }
+    .flow span { align-self: center; color: var(--brand); text-align: center; font-size: 1.3rem; }
+    .small { color: var(--muted); font-size: .92rem; }
+    footer { max-width: 1400px; margin: 0 auto; padding: 1rem 1.25rem 2rem; color: var(--muted); }
+    @media (max-width: 880px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { position: static; max-height: none; columns: 2; }
+      nav strong { column-span: all; }
+    }
+    @media (max-width: 560px) {
+      .hero { padding-top: 2.4rem; padding-bottom: 2rem; }
+      nav { columns: 1; }
+      .flow { grid-template-columns: 1fr; }
+      .flow span { transform: rotate(90deg); }
+    }
+    @media print {
+      body { background: white; font-size: 11pt; }
+      .hero { padding: 1rem; background: white; color: var(--ink); }
+      .hero p:last-child, .eyebrow { color: var(--muted); }
+      .layout { display: block; margin: 0; padding: 0; }
+      nav { display: none; }
+      section, .summary-card { break-inside: avoid; box-shadow: none; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Desarrollo web integrado · Documentación técnica</p>
+      <h1>NovaBook Biblioteca</h1>
+      <p>Descripción del sistema, su arquitectura, funcionamiento y servicios externos. La organización sigue la guía <em>Estructura_Proyecto_GRAL</em> adjunta y distingue lo implementado de lo que permanece como simulación o pendiente.</p>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav aria-label="Contenido del documento">
+      <strong>Contenido</strong>
+      <a href="#resumen">Resumen</a>
+      <a href="#capitulo-i">I. Planteamiento</a>
+      <a href="#capitulo-ii">II. Marco teórico</a>
+      <a href="#capitulo-iii">III. Análisis y diseño</a>
+      <a href="#capitulo-iv">IV. Desarrollo</a>
+      <a href="#apis">APIs e integraciones</a>
+      <a href="#capitulo-v">V. Pruebas y resultados</a>
+      <a href="#capitulo-vi">VI. Despliegue</a>
+      <a href="#conclusiones">Conclusiones</a>
+      <a href="#recomendaciones">Recomendaciones</a>
+      <a href="#referencias">Referencias</a>
+      <a href="#anexos">Anexos</a>
+    </nav>
+
+    <main>
+      <section id="resumen" class="summary-card">
+        <h2>Resumen</h2>
+        <p>NovaBook es una aplicación web para consultar y administrar un catálogo de libros. Los visitantes pueden explorar el catálogo; los usuarios registrados pueden gestionar su perfil y carrito; y los administradores pueden administrar libros y usuarios. La aplicación separa la interfaz Angular de una API REST Spring Boot y guarda la información persistente en PostgreSQL alojado en Supabase.</p>
+        <div class="grid">
+          <div class="card"><h3>Problema abordado</h3><p>La administración de un catálogo y de las interacciones de compra requiere centralizar libros, usuarios, inventario y navegación en una interfaz accesible.</p></div>
+          <div class="card"><h3>Solución implementada</h3><p>Frontend Angular, API REST en Java/Spring Boot, persistencia JPA/Hibernate y servicios de catálogo bibliográfico externo.</p></div>
+          <div class="card"><h3>Tecnologías</h3><p>Java 25, Spring Boot 4.1.1, Angular 22, TypeScript 6, PostgreSQL, Supabase, JWT y jsPDF.</p></div>
+          <div class="card"><h3>Resultado y límite</h3><p>El catálogo y los flujos principales están implementados. El pago Visa/BCP y el comprobante actual son demostrativos: no existe procesamiento bancario ni emisión tributaria.</p></div>
+        </div>
+      </section>
+
+      <section id="capitulo-i">
+        <h2>Capítulo I. Planteamiento del proyecto</h2>
+        <h3>1.1 Realidad problemática</h3>
+        <p>Una biblioteca o librería necesita mantener un catálogo consultable y actualizado, controlar datos de libros, atender a sus usuarios y ofrecer una experiencia digital consistente. Si estas tareas se realizan mediante procesos separados, puede ser más difícil encontrar libros, mantener el inventario y administrar las cuentas.</p>
+
+        <h3>1.2 Formulación del problema</h3>
+        <p><strong>Problema general:</strong> ¿Cómo desarrollar un sistema web integrado que facilite la consulta y administración de un catálogo de libros, usuarios y carrito de compras?</p>
+        <p><strong>Problemas específicos:</strong> ¿Cómo exponer las funciones mediante servicios REST? ¿Cómo persistir libros y usuarios? ¿Cómo autenticar usuarios y limitar funciones administrativas? ¿Cómo integrar Angular con el backend y servicios externos de libros?</p>
+
+        <h3>1.3 Objetivos</h3>
+        <ul>
+          <li><strong>Objetivo general:</strong> desarrollar una aplicación web de biblioteca con Angular y Spring Boot.</li>
+          <li>Implementar operaciones REST para libros, cuentas, administración y carrito.</li>
+          <li>Persistir entidades con JPA/Hibernate en PostgreSQL.</li>
+          <li>Autenticar mediante JWT y distinguir los roles <code>ADMIN</code> y <code>CLIENTE</code>.</li>
+          <li>Integrar búsquedas bibliográficas con Google Books y Open Library.</li>
+          <li>Desplegar frontend y backend en servicios de nube configurados por el proyecto.</li>
+        </ul>
+
+        <h3>1.4 Justificación</h3>
+        <div class="grid">
+          <div class="card"><h4>Tecnológica</h4><p>Separa presentación, lógica de negocio y persistencia, y usa interfaces REST para conectar el frontend y el backend.</p></div>
+          <div class="card"><h4>Operativa</h4><p>Concentra en una aplicación la consulta de libros, la gestión administrativa, el perfil de usuario y el carrito.</p></div>
+          <div class="card"><h4>Económica</h4><p>La solución usa frameworks y servicios con planes de entrada, pero algunos servicios externos pueden requerir cuotas o facturación según uso.</p></div>
+        </div>
+
+        <h3>1.5 Alcance</h3>
+        <ul>
+          <li>Catálogo de libros, búsqueda, filtros, paginación y consulta de libros más vendidos.</li>
+          <li>Registro, inicio de sesión, perfil y carga de avatar.</li>
+          <li>Administración de libros y usuarios para cuentas con rol administrador.</li>
+          <li>Carrito por usuario y un flujo de pago exclusivamente de demostración.</li>
+          <li>Generación local de un PDF marcado sin validez tributaria.</li>
+        </ul>
+
+        <h3>1.6 Limitaciones identificadas en el código</h3>
+        <ul>
+          <li>El carrito se guarda en memoria del proceso; se pierde al reiniciar el backend y no se comparte entre varias instancias.</li>
+          <li>El pago no se conecta con Visa, BCP ni otra pasarela; los datos de tarjeta de prueba no se envían al backend.</li>
+          <li>El flujo de pago simulado calcula datos para la vista/PDF, pero no persiste una venta, no descuenta stock y no crea una boleta legal.</li>
+          <li>La dirección se escribe manualmente y se incluye en el PDF generado en el navegador.</li>
+          <li>Se requiere configurar y rotar las credenciales de servicios externos mediante variables de entorno antes de publicar.</li>
+        </ul>
+      </section>
+
+      <section id="capitulo-ii">
+        <h2>Capítulo II. Marco teórico</h2>
+        <h3>2.1 Desarrollo web y arquitectura cliente-servidor</h3>
+        <p>El cliente Angular presenta las páginas y envía solicitudes HTTP. El servidor Spring Boot valida esas solicitudes, aplica reglas de negocio y consulta o actualiza la base de datos. La respuesta vuelve normalmente como JSON.</p>
+
+        <h3>2.2 Spring Boot y arquitectura del backend</h3>
+        <p>Spring Boot configura la aplicación Java y sus componentes. La inyección de dependencias conecta controladores, servicios y repositorios. Los controladores reciben solicitudes REST; los servicios concentran operaciones de negocio; los repositorios acceden a las entidades persistentes.</p>
+
+        <h3>2.3 API REST y métodos HTTP</h3>
+        <ul>
+          <li><code>GET</code>: consultar libros, usuarios o contenido del carrito.</li>
+          <li><code>POST</code>: registrar usuarios, iniciar sesión, agregar libros al carrito o simular el pago.</li>
+          <li><code>PUT</code>: modificar libros o el perfil de usuario.</li>
+          <li><code>DELETE</code>: quitar artículos, vaciar el carrito o eliminar registros administrativos.</li>
+        </ul>
+        <p>Los controladores devuelven códigos HTTP y respuestas JSON. El frontend consume la API con <code>HttpClient</code> de Angular.</p>
+
+        <h3>2.4 Pruebas</h3>
+        <p>El proyecto incluye pruebas Java con JUnit/Spring Boot. La guía adjunta propone TDD, Postman y Swagger; no se encontró evidencia suficiente para afirmar que se haya seguido TDD ni que exista una colección Postman. Springdoc aparece como dependencia del backend; la disponibilidad de su interfaz debe verificarse en el entorno desplegado.</p>
+
+        <h3>2.5 Persistencia</h3>
+        <p>JPA define el mapeo entre entidades Java y tablas. Hibernate implementa la persistencia ORM. El backend usa PostgreSQL mediante JDBC y Spring Data repositories. Las operaciones de libro y usuario se guardan en la base de datos; el carrito, en cambio, es temporal y vive en memoria.</p>
+
+        <h3>2.6 Seguridad web</h3>
+        <p>Las contraseñas se codifican con BCrypt. Al iniciar sesión, el backend firma un JWT con una vigencia de dos horas; el frontend lo envía como <code>Authorization: Bearer …</code>. El backend recupera el usuario asociado y algunos controladores verifican el rol <code>ADMIN</code>.</p>
+        <div class="callout warning"><strong>Precaución:</strong> las propiedades de configuración incluyen valores predeterminados que parecen credenciales. No se reproducen aquí. Deben rotarse y mantenerse solo en variables de entorno o en un gestor de secretos.</div>
+      </section>
+
+      <section id="capitulo-iii">
+        <h2>Capítulo III. Análisis y diseño del sistema</h2>
+        <h3>3.1 Requerimientos funcionales implementados</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Requerimiento</th><th>Implementación observada</th></tr></thead>
+            <tbody>
+              <tr><td>RF01</td><td>Consultar catálogo</td><td>Listado paginado, búsqueda por nombre/autor, filtro por tipo, detalle y más vendidos.</td></tr>
+              <tr><td>RF02</td><td>Administrar libros</td><td>Crear, editar y eliminar libros; restringido a administradores.</td></tr>
+              <tr><td>RF03</td><td>Gestionar cuentas</td><td>Registro, login, perfil, avatar y administración de usuarios.</td></tr>
+              <tr><td>RF04</td><td>Gestionar carrito</td><td>Agregar, consultar, retirar artículos y vaciar el carrito; verifica stock al agregar.</td></tr>
+              <tr><td>RF05</td><td>Buscar datos bibliográficos externos</td><td>Google Books primero y Open Library como respaldo.</td></tr>
+              <tr><td>RF06</td><td>Probar checkout</td><td>Validación local de una tarjeta ficticia y respuesta simulada del backend; sin cobro.</td></tr>
+              <tr><td>RF07</td><td>Descargar comprobante</td><td>PDF local con datos de prueba; se identifica como demo y sin validez tributaria.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>3.1.2 Requerimientos no funcionales</h3>
+        <ul>
+          <li><strong>Seguridad:</strong> contraseñas BCrypt, JWT y control de rol en endpoints administrativos.</li>
+          <li><strong>Disponibilidad:</strong> depende del backend, PostgreSQL/Supabase y servicios externos.</li>
+          <li><strong>Rendimiento:</strong> catálogo paginado; las consultas externas se ejecutan desde backend y dependen de la latencia de terceros.</li>
+          <li><strong>Escalabilidad:</strong> el carrito en memoria limita el escalado horizontal hasta que se persista en una base compartida o caché distribuida.</li>
+        </ul>
+
+        <h3>3.2 Casos de uso principales</h3>
+        <ol>
+          <li><strong>Visitante:</strong> navegar el catálogo, filtrar libros y ver detalles.</li>
+          <li><strong>Cliente:</strong> registrarse, iniciar sesión, editar perfil, añadir libros al carrito y revisar el checkout de prueba.</li>
+          <li><strong>Administrador:</strong> gestionar libros y usuarios; importar metadatos de un catálogo externo al formulario de libro.</li>
+        </ol>
+
+        <h3>3.3 Modelo de negocio</h3>
+        <p>El cliente consulta libros y puede organizar una selección en su carrito. El administrador mantiene el catálogo. En la versión actual el checkout solo ensaya la experiencia de pago; no produce una transacción comercial.</p>
+
+        <h3>3.4 Modelo de clases y 3.5 Modelo relacional</h3>
+        <div class="grid">
+          <div class="card"><h4>Usuario</h4><p>Nombre, correo, contraseña codificada, avatar y rol.</p></div>
+          <div class="card"><h4>Libro</h4><p>Nombre, tipo, editorial, año, precio, stock, portada, autor y descripción.</p></div>
+          <div class="card"><h4>Boleta y detalle</h4><p>Las entidades modelan usuario, fecha, total y líneas de libros. El servicio <code>BoletaService</code> puede guardar una venta real en base de datos, pero el endpoint actual de checkout de prueba no lo invoca.</p></div>
+          <div class="card"><h4>Carrito</h4><p>Mapa temporal de usuario → libro → cantidad, mantenido en memoria por <code>CarritoService</code>.</p></div>
+        </div>
+        <p class="small">Relaciones persistentes del modelo: un usuario puede estar asociado a varias boletas; una boleta contiene varios detalles; cada detalle referencia un libro.</p>
+
+        <h3>3.6 Arquitectura del sistema</h3>
+        <div class="flow" aria-label="Flujo de arquitectura">
+          <div>Angular<br><span class="small">interfaz web</span></div><span aria-hidden="true">→</span>
+          <div>API REST<br><span class="small">JSON / HTTP</span></div><span aria-hidden="true">→</span>
+          <div>Spring Boot<br><span class="small">controladores y servicios</span></div>
+        </div>
+        <div class="flow">
+          <div>Spring Data JPA</div><span aria-hidden="true">→</span>
+          <div>Hibernate ORM</div><span aria-hidden="true">→</span>
+          <div>PostgreSQL en Supabase</div>
+        </div>
+        <p>Además, el backend consulta Google Books/Open Library y sube avatares a Supabase Storage. El PDF se genera en el navegador.</p>
+      </section>
+
+      <section id="capitulo-iv">
+        <h2>Capítulo IV. Desarrollo del sistema</h2>
+        <h3>4.1 Configuración del entorno</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Área</th><th>Versión/configuración observada</th></tr></thead>
+            <tbody>
+              <tr><td>Java</td><td>25 (LTS configurado en Maven y en las imágenes Docker).</td></tr>
+              <tr><td>Backend</td><td>Spring Boot 4.1.1; Maven Wrapper.</td></tr>
+              <tr><td>Frontend</td><td>Angular 22, TypeScript 6, RxJS 7.8.</td></tr>
+              <tr><td>Base de datos</td><td>PostgreSQL administrado por Supabase; Hibernate/JPA.</td></tr>
+              <tr><td>PDF</td><td>jsPDF, cargado dinámicamente en el frontend.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>4.2 Backend</h3>
+        <ul>
+          <li><code>controller/</code>: endpoints REST para autenticación, libros, carrito, checkout y administración.</li>
+          <li><code>service/</code>: lógica de aplicación, consultas bibliográficas, JWT, perfiles, carrito y almacenamiento.</li>
+          <li><code>repository/</code>: interfaces Spring Data para las entidades.</li>
+          <li><code>entity/</code>: entidades JPA de usuario, libro, boleta y detalle.</li>
+          <li><code>config/</code>: interceptor JWT y configuración web/CORS.</li>
+        </ul>
+
+        <h3>4.3 Seguridad y roles</h3>
+        <p>Los roles que aparecen en la lógica del proyecto son <code>ADMIN</code> y <code>CLIENTE</code>. El registro público fuerza el rol de cliente; los endpoints de administración comprueban que el usuario autenticado sea administrador. El cierre de sesión elimina el token del cliente; el endpoint backend de logout no mantiene una lista de revocación.</p>
+
+        <h3>4.4 Frontend Angular</h3>
+        <p>La aplicación organiza la interfaz por páginas/componentes y usa rutas protegidas para el carrito, checkout, perfil y administración. Los servicios Angular encapsulan peticiones HTTP. El token de sesión se guarda en <code>sessionStorage</code>. El campo de dirección del checkout es de escritura manual.</p>
+
+        <h3>4.5 Integración frontend-backend</h3>
+        <p>En desarrollo el frontend apunta a <code>http://localhost:8080/api</code>; el archivo de entorno de producción apunta a una URL de backend en Render. Para solicitudes protegidas, un interceptor del frontend adjunta el token JWT. CORS permite el origen local y el dominio frontend configurado en el backend.</p>
+      </section>
+
+      <section id="apis">
+        <h2>APIs e integraciones utilizadas</h2>
+        <p>La palabra “API” puede referirse a los endpoints propios del sistema o a servicios externos. Esta tabla separa ambos tipos y marca lo que solo es una simulación.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Servicio</th><th>Tipo</th><th>Uso y estado</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>API REST de NovaBook (<code>/api</code>)</td>
+                <td>Propia</td>
+                <td>La consume Angular para autenticación, catálogo, perfil, usuarios, carrito y checkout.</td>
+              </tr>
+              <tr>
+                <td><a href="https://developers.google.com/books/docs/v1/using" target="_blank" rel="noopener noreferrer">Google Books API</a></td>
+                <td>Externa</td>
+                <td>Primera fuente para buscar libros por texto y obtener título, autor, editorial, fecha, portada e ISBN. La clave es opcional en el código, aunque se configura en propiedades.</td>
+              </tr>
+              <tr>
+                <td><a href="https://openlibrary.org/dev/docs/api/search" target="_blank" rel="noopener noreferrer">Open Library Search API</a> y Covers</td>
+                <td>Externa</td>
+                <td>Respaldo cuando Google Books falla o no devuelve resultados. También se usa su servicio de portadas cuando hay identificador de cubierta.</td>
+              </tr>
+              <tr>
+                <td>Supabase PostgreSQL</td>
+                <td>Base de datos gestionada</td>
+                <td>Persistencia relacional; el backend se conecta a PostgreSQL mediante JDBC.</td>
+              </tr>
+              <tr>
+                <td><a href="https://supabase.com/docs/guides/storage" target="_blank" rel="noopener noreferrer">Supabase Storage API</a></td>
+                <td>Externa</td>
+                <td>Almacena avatares mediante una solicitud HTTP del backend con la clave de servicio.</td>
+              </tr>
+              <tr>
+                <td>Visa / BCP</td>
+                <td><span class="badge demo">No integrado</span></td>
+                <td>El formulario usa datos ficticios validados solo en el frontend. El backend calcula una respuesta de simulación. No hay autorización bancaria, cobro ni conexión con una pasarela BCP/Visa.</td>
+              </tr>
+              <tr>
+                <td>Google Maps</td>
+                <td>Eliminada</td>
+                <td>No se carga ni se consulta; la dirección se escribe manualmente.</td>
+              </tr>
+              <tr>
+                <td>jsPDF</td>
+                <td>Librería local</td>
+                <td>Construye el comprobante PDF en el navegador; no llama a un servicio remoto y el documento no es una boleta tributaria.</td>
+              </tr>
+              <tr>
+                <td>Springdoc OpenAPI</td>
+                <td>Dependencia de documentación</td>
+                <td>Está declarada en Maven. Su interfaz/endpoints deben probarse antes de presentarlos como disponibles en producción.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Endpoints REST principales</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Ruta</th><th>Métodos observados</th><th>Función</th></tr></thead>
+            <tbody>
+              <tr><td><code>/api/auth</code></td><td>POST login/registro/logout; GET usuario/listado; PUT perfil</td><td>Autenticación, consulta de sesión y perfil; listado administrativo protegido.</td></tr>
+              <tr><td><code>/api/libros</code></td><td>GET colección/detalle/mas-vendidos/catalogo/buscar; POST/PUT/DELETE</td><td>Consulta y administración de libros; la escritura requiere administrador.</td></tr>
+              <tr><td><code>/api/carrito</code></td><td>GET, POST agregar/{id}, DELETE /{id}, DELETE /vaciar, GET /cantidad</td><td>Operaciones del carrito para el usuario autenticado.</td></tr>
+              <tr><td><code>/api/admin/usuarios</code></td><td>GET, POST, PUT /{id}, DELETE /{id}</td><td>CRUD administrativo de usuarios; requiere rol ADMIN.</td></tr>
+              <tr><td><code>/api/checkout/simular</code></td><td>POST</td><td>Simula Visa/BCP para la presentación académica. No procesa datos de tarjeta ni crea una venta persistente.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Flujo de búsqueda del catálogo externo</h3>
+        <ol>
+          <li>El formulario de administración llama a <code>GET /api/libros/catalogo/buscar?q=…</code>.</li>
+          <li>El backend busca primero en Google Books.</li>
+          <li>Si la búsqueda primaria falla o queda vacía, intenta Open Library.</li>
+          <li>El frontend permite copiar los metadatos al formulario; el administrador revisa y guarda el libro localmente.</li>
+        </ol>
+        <h3>Flujo del checkout de prueba</h3>
+        <ol>
+          <li>El usuario escribe una dirección y completa únicamente los datos ficticios indicados en el formulario.</li>
+          <li>La validación de tarjeta ocurre en el navegador; esos campos no forman parte de la solicitud al backend.</li>
+          <li>El endpoint protegido verifica usuario, carrito y stock, calcula total y devuelve un DTO marcado <code>DEMO_NO_REAL</code>.</li>
+          <li>La pantalla de resultado ofrece el PDF local, claramente marcado como demostración y sin validez tributaria.</li>
+        </ol>
+      </section>
+
+      <section id="capitulo-v">
+        <h2>Capítulo V. Pruebas y resultados</h2>
+        <h3>5.1 Pruebas unitarias e integración</h3>
+        <p>Se observaron pruebas de contexto de Spring Boot y una prueba de <code>JwtService</code>. En la ejecución más reciente registrada del backend, ambas pruebas pasaron.</p>
+        <h3>5.2 Verificación del frontend</h3>
+        <p>La compilación de producción con <code>npm run build</code> pasó. La suite Angular disponible contiene fallos previos en <code>app.spec.ts</code>: las pruebas de creación/renderizado de la aplicación no tienen proveedor de <code>ActivatedRoute</code>. Esto no equivale a una prueba funcional del checkout.</p>
+        <h3>5.3 Pruebas REST</h3>
+        <p>La aplicación define endpoints REST descritos en el capítulo IV. No se adjuntó una colección Postman ni evidencia de ejecución de una suite Postman/Swagger, por lo que esas pruebas quedan pendientes de documentar.</p>
+        <h3>5.4 Evidencias y 5.5 resultados</h3>
+        <ul>
+          <li>La arquitectura frontend/backend y el acceso a PostgreSQL funcionan en pruebas de contexto.</li>
+          <li>El proyecto compila con Java 25 y Angular 22.</li>
+          <li>Las búsquedas externas dependen de disponibilidad/cuotas de Google Books y Open Library.</li>
+          <li>El checkout solo demuestra interacción y no constituye una compra o comprobante legal.</li>
+        </ul>
+        <p class="small">Para la entrega académica conviene añadir capturas reales de login, catálogo, administración, carrito, checkout y PDF, sin mostrar credenciales ni datos personales.</p>
+      </section>
+
+      <section id="capitulo-vi">
+        <h2>Capítulo VI. Despliegue</h2>
+        <h3>6.1 Preparación y configuración</h3>
+        <p>El backend usa Maven Wrapper; la configuración Docker declara una etapa de compilación con Maven/Temurin 25 y una etapa de ejecución Temurin 25 JRE. Las URLs de API, base de datos, almacenamiento, clave JWT y Google Books se configuran mediante propiedades de Spring.</p>
+        <h3>6.2–6.5 Servidor y publicación</h3>
+        <p>El entorno de producción del frontend apunta a un backend en Render. El backend configura CORS para localhost y un origen frontend Render. La base de datos y el bucket de avatares están configurados para Supabase. Estas son configuraciones del proyecto; este documento no certifica que los servicios remotos estén activos o disponibles.</p>
+        <h3>6.6 Cloud y Docker</h3>
+        <p>Docker empaqueta el backend como aplicación Java ejecutable. El frontend se construye de forma independiente con Angular. Para reproducir el despliegue hay que definir las variables de entorno en la plataforma y mantener las claves fuera del repositorio.</p>
+        <div class="callout warning"><strong>Acción necesaria antes de publicar:</strong> eliminar los valores secretos predeterminados del archivo <code>application.properties</code>, rotar credenciales ya expuestas y configurar variables del entorno en el proveedor de despliegue. No compartir copias de configuración que incluyan claves.</div>
+      </section>
+
+      <section id="conclusiones">
+        <h2>Conclusiones</h2>
+        <ol>
+          <li>La aplicación integra una interfaz Angular con una API REST implementada en Spring Boot.</li>
+          <li>JPA/Hibernate y PostgreSQL cubren la persistencia de libros y usuarios, mientras el carrito continúa siendo temporal en memoria.</li>
+          <li>JWT y BCrypt forman parte del flujo de autenticación; los roles observados son ADMIN y CLIENTE.</li>
+          <li>Google Books y Open Library amplían la búsqueda bibliográfica y reducen la dependencia de una única fuente externa.</li>
+          <li>El pago Visa/BCP y el PDF son demostrativos; no se debe presentar el flujo como una transacción o comprobante legal.</li>
+          <li>La compilación y pruebas de backend verificadas son satisfactorias, aunque las pruebas Angular de AppComponent requieren configuración adicional.</li>
+        </ol>
+      </section>
+
+      <section id="recomendaciones">
+        <h2>Recomendaciones</h2>
+        <ol>
+          <li>Rotar cualquier credencial expuesta y usar únicamente variables de entorno o un gestor de secretos.</li>
+          <li>Persistir el carrito en una base de datos o caché compartida para evitar pérdida al reiniciar y permitir varias instancias.</li>
+          <li>Si se requiere vender, contratar e integrar un checkout alojado/tokenizado de un proveedor autorizado; nunca enviar CVV o tarjeta al backend propio.</li>
+          <li>Para emitir boletas válidas, integrar un proveedor autorizado de comprobantes electrónicos y usar datos tributarios reales verificados.</li>
+          <li>Agregar pruebas unitarias para el carrito, validaciones de stock, permisos administrativos y checkout simulado.</li>
+          <li>Configurar router/proveedores en las pruebas Angular y documentar una colección de pruebas REST reproducible.</li>
+          <li>Verificar cuotas, límites, disponibilidad y atribución exigida por Google Books, Open Library y Supabase.</li>
+        </ol>
+      </section>
+
+      <section id="referencias">
+        <h2>Referencias bibliográficas</h2>
+        <ol>
+          <li>Google, “Books API: Getting Started.” [En línea]. Disponible en: <a href="https://developers.google.com/books/docs/v1/using" target="_blank" rel="noopener noreferrer">developers.google.com/books/docs/v1/using</a>.</li>
+          <li>Open Library, “Search API.” [En línea]. Disponible en: <a href="https://openlibrary.org/dev/docs/api/search" target="_blank" rel="noopener noreferrer">openlibrary.org/dev/docs/api/search</a>.</li>
+          <li>Supabase, “Storage.” [En línea]. Disponible en: <a href="https://supabase.com/docs/guides/storage" target="_blank" rel="noopener noreferrer">supabase.com/docs/guides/storage</a>.</li>
+          <li>Spring, “Spring Boot Reference Documentation.” [En línea]. Disponible en: <a href="https://docs.spring.io/spring-boot/reference/" target="_blank" rel="noopener noreferrer">docs.spring.io/spring-boot/reference</a>.</li>
+          <li>Angular, “Angular Documentation.” [En línea]. Disponible en: <a href="https://angular.dev/overview" target="_blank" rel="noopener noreferrer">angular.dev/overview</a>.</li>
+          <li>Oracle, “Java Documentation.” [En línea]. Disponible en: <a href="https://docs.oracle.com/en/java/" target="_blank" rel="noopener noreferrer">docs.oracle.com/en/java</a>.</li>
+          <li>“Estructura_Proyecto_GRAL,” documento adjunto al chat, guía de organización académica en seis capítulos, conclusiones, recomendaciones, referencias y anexos.</li>
+        </ol>
+      </section>
+
+      <section id="anexos">
+        <h2>Anexos</h2>
+        <h3>Anexo A. Manual de usuario: recorrido breve</h3>
+        <ol>
+          <li>Abrir el catálogo y buscar por nombre o autor.</li>
+          <li>Iniciar sesión o registrarse para usar el carrito.</li>
+          <li>Agregar libros y verificar cantidades antes de abrir checkout.</li>
+          <li>En la presentación de prueba, usar solo los datos de tarjeta ficticios que muestra la página y escribir la dirección.</li>
+          <li>Descargar el PDF de prueba; no usarlo como comprobante fiscal ni como confirmación de pago.</li>
+        </ol>
+        <h3>Anexo B. Manual técnico: archivos relevantes</h3>
+        <ul>
+          <li><a href="Biblioteca-Backend/pom.xml">pom.xml</a> y <a href="Biblioteca-Backend/Dockerfile">Dockerfile</a>: dependencias, Java y empaquetado.</li>
+          <li><a href="Biblioteca-Backend/src/main/java/com/example/Biblioteca/controller/LibroRestController.java">LibroRestController.java</a>: endpoints de libros y catálogo externo.</li>
+          <li><a href="Biblioteca-Backend/src/main/java/com/example/Biblioteca/service/CatalogoExternoService.java">CatalogoExternoService.java</a>: Google Books y Open Library.</li>
+          <li><a href="Biblioteca-Backend/src/main/java/com/example/Biblioteca/service/SupabaseStorageService.java">SupabaseStorageService.java</a>: carga de avatares.</li>
+          <li><a href="Biblioteca-Frontend/src/app/pages/checkout/checkout.component.ts">checkout.component.ts</a>: validación local y simulación de pago.</li>
+          <li><a href="Biblioteca-Frontend/src/app/services/comprobante-pdf.service.ts">comprobante-pdf.service.ts</a>: creación local del PDF.</li>
+          <li><a href="Biblioteca-Backend/src/main/resources/application.properties">application.properties</a>: revisar solo localmente y no distribuir si contiene credenciales.</li>
+        </ul>
+        <h3>Anexos pendientes para completar la memoria</h3>
+        <p>Capturas del sistema, diagrama UML exportado, colección Postman, enlaces definitivos de repositorio/despliegue y evidencias de pruebas deben agregarse por el equipo cuando estén disponibles.</p>
+      </section>
+    </main>
+  </div>
+  <footer>
+    <p>Documento generado a partir de la estructura académica adjunta y contrastado con el código fuente del proyecto. Las funciones de pago y comprobante se describen con su estado real de demostración.</p>
+  </footer>
+</body>
+</html>
