@@ -1,22 +1,51 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { BoletaService } from '../../services/boleta.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [RouterLink],
+  imports: [FormsModule, RouterLink],
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.css']
 })
 export class CheckoutComponent {
-  constructor(private boletaService: BoletaService, private router: Router) {}
+  qrVisible = false;
+  procesando = false;
+  error = '';
+  direccion = '';
 
-  confirmar() {
-    this.boletaService.confirmarCompra().subscribe({
-      next: () => this.router.navigate(['/exito']),
-      error: (err) => alert('Error: ' + err.error)
+  constructor(
+    private boletaService: BoletaService,
+    private router: Router
+  ) {}
+
+  mostrarQr(): void {
+    this.qrVisible = true;
+  }
+
+  confirmar(): void {
+    if (!this.qrVisible || this.procesando) {
+      return;
+    }
+    if (!this.direccion.trim()) {
+      this.error = 'Ingresa la dirección para el comprobante de demostración.';
+      return;
+    }
+
+    this.procesando = true;
+    this.error = '';
+    this.boletaService.simularPagoYape().subscribe({
+      next: (pagoDemo) => {
+        void this.router.navigate(['/exito'], {
+          state: { pagoDemo, direccion: this.direccion.trim() }
+        });
+      },
+      error: (err) => {
+        this.procesando = false;
+        this.error = err.error?.error || 'No se pudo registrar la demostración.';
+      }
     });
   }
 }

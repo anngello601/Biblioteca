@@ -3,10 +3,33 @@
     <div class="card-body p-5 text-center">
       <i class="fas fa-clipboard-check fa-4x text-primary mb-4"></i>
       <h2 class="mb-3">Confirmar compra</h2>
-      <p class="text-muted mb-4">Revisa tu carrito antes de confirmar. Una vez confirmada, no podrás deshacer la operación.</p>
+      <p class="text-muted mb-4">Prueba el flujo de pago con un QR ilustrativo de Yape. Esta demostración no realiza cobros reales.</p>
+      <div class="mb-4 text-start">
+        <label class="form-label" for="direccion">Dirección del comprador</label>
+        <textarea id="direccion" class="form-control" name="direccion" rows="2"
+          [(ngModel)]="direccion" autocomplete="street-address"
+          placeholder="Selecciona o escribe la dirección" required></textarea>
+        <div class="form-text">Dato solo para el PDF de demostración; no se guarda ni se envía al servidor.</div>
+      </div>
+      <div class="mb-4">
+        <button class="btn btn-outline-primary" type="button" (click)="mostrarQr()" [disabled]="procesando">
+          <i class="fas fa-qrcode me-2"></i>Mostrar QR de demostración
+        </button>
+      </div>
+      @if (qrVisible) {
+        <div class="border rounded p-4 mb-4" role="status" aria-live="polite">
+          <i class="fas fa-qrcode fa-5x text-primary mb-3" aria-hidden="true"></i>
+          <h3 class="h5">Yape — QR de muestra</h3>
+          <p class="text-muted mb-0">No es un código escaneable y no envía dinero.</p>
+        </div>
+      }
+      @if (error) {
+        <div class="alert alert-danger" role="alert">{{ error }}</div>
+      }
       <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-        <button class="btn btn-success btn-lg" (click)="confirmar()">
-          <i class="fas fa-check-circle me-2"></i> Sí, comprar
+        <button class="btn btn-success btn-lg" (click)="confirmar()" [disabled]="!qrVisible || procesando">
+          <i class="fas fa-check-circle me-2"></i>
+          {{ procesando ? 'Registrando demostración...' : 'Completar compra de demostración' }}
         </button>
         <a routerLink="/carrito" class="btn btn-outline-secondary btn-lg">
           <i class="fas fa-arrow-left me-1"></i> Volver al carrito

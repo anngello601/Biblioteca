@@ -41,4 +41,11 @@ export class LibroService {
   getMasVendidos(limite: number = 8): Observable<Libro[]> {
     return this.http.get<Libro[]>(`${this.apiUrl}/mas-vendidos?limite=${limite}`);
   }
+
+  buscarCatalogoExterno(query: string, limite: number = 10): Observable<any[]> {
+    const params = new HttpParams()
+      .set('q', query)
+      .set('limite', limite.toString());
+    return this.http.get<any[]>(`${this.apiUrl}/catalogo/buscar`, { params });
+  }
 }

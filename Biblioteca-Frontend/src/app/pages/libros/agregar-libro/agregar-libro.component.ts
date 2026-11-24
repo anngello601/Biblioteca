@@ -14,6 +14,9 @@ import { Libro } from '../../../models/libro.model';
 export class AgregarLibroComponent implements OnInit {
   private libroService = inject(LibroService);
   searchTerm = signal<string>(''); // 👈 Nueva señal
+  catalogoQuery = signal<string>('');
+  catalogoResultados = signal<any[]>([]);
+  buscandoCatalogo = signal<boolean>(false);
 
 
   // Estado de paginación
@@ -69,6 +72,40 @@ export class AgregarLibroComponent implements OnInit {
     this.searchTerm.set('');
     this.currentPage.set(0);
     this.cargarLibros();
+  }
+
+  buscarCatalogoExterno() {
+    const query = this.catalogoQuery().trim();
+    if (!query) return;
+
+    this.buscandoCatalogo.set(true);
+    this.libroService.buscarCatalogoExterno(query).subscribe({
+      next: (resultados) => {
+        this.catalogoResultados.set(resultados);
+        this.buscandoCatalogo.set(false);
+      },
+      error: (err) => {
+        alert(err.error?.error || 'No se pudo consultar el catálogo externo');
+        this.buscandoCatalogo.set(false);
+      }
+    });
+  }
+
+  importarResultado(resultado: any) {
+    this.editandoId.set(null);
+    this.formLibro.set({
+      id: 0,
+      nombre: resultado.nombre || '',
+      tipo: 'FISICO',
+      editorial: resultado.editorial || '',
+      anioPublicacion: resultado.anioPublicacion || new Date().getFullYear(),
+      precio: 0,
+      stock: 0,
+      portada: resultado.portada || '',
+      autor: resultado.autor || '',
+      descripcion: resultado.descripcion || ''
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
 

@@ -1,6 +1,42 @@
 <div class="container mt-5 pt-5">
   <h2 class="mb-4">{{ editandoId() !== null ? 'Editar Libro' : 'Agregar Nuevo Libro' }}</h2>
 
+  <div class="card shadow-sm p-4 mb-4">
+    <h5>Buscar en Google Books / Open Library</h5>
+    <div class="input-group">
+      <input type="text" class="form-control" name="catalogoQuery"
+        placeholder="Título, autor o ISBN..."
+        [(ngModel)]="catalogoQuery" (keyup.enter)="buscarCatalogoExterno()">
+      <button type="button" class="btn btn-primary" (click)="buscarCatalogoExterno()" [disabled]="buscandoCatalogo()">
+        {{ buscandoCatalogo() ? 'Buscando...' : 'Buscar catálogo' }}
+      </button>
+    </div>
+
+    @if (catalogoResultados().length > 0) {
+      <div class="row g-3 mt-2">
+        @for (resultado of catalogoResultados(); track resultado.nombre + resultado.isbn) {
+          <div class="col-md-6 col-xl-4">
+            <div class="card h-100">
+              <div class="card-body d-flex gap-3">
+                @if (resultado.portada) {
+                  <img [src]="resultado.portada" alt="Portada" style="width: 65px; height: 95px; object-fit: cover;">
+                }
+                <div class="flex-grow-1">
+                  <strong>{{ resultado.nombre }}</strong>
+                  <div class="small text-muted">{{ resultado.autor }}</div>
+                  <div class="small">{{ resultado.editorial }} · {{ resultado.anioPublicacion }}</div>
+                  <span class="badge text-bg-light mt-1">{{ resultado.fuente }}</span>
+                  <button type="button" class="btn btn-sm btn-outline-primary d-block mt-2"
+                    (click)="importarResultado(resultado)">Usar datos</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
   <div class="card shadow-sm p-4 mb-5">
     <form (ngSubmit)="guardarLibro()">
       <!-- Aquí va tu formulario igual que antes (Nombre, Tipo, Stock, etc.) -->

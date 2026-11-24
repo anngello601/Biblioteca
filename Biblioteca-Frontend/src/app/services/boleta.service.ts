@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Boleta } from '../models/boleta.model';
+import { PagoDemo } from '../models/pago-demo.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -11,7 +11,10 @@ export class BoletaService {
 
   constructor(private http: HttpClient) {}
 
-  confirmarCompra(): Observable<Boleta> {
-    return this.http.post<Boleta>(`${this.apiUrl}/confirmar`, {});
+  simularPagoYape(): Observable<PagoDemo> {
+    return this.http.post<PagoDemo>(
+      `${this.apiUrl}/simular?metodoPago=YAPE_DEMO`,
+      {}
+    );
   }
 }

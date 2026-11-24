@@ -3,6 +3,7 @@ package com.example.Biblioteca.controller;
 import com.example.Biblioteca.entity.Libro;
 import com.example.Biblioteca.entity.Usuario;
 import com.example.Biblioteca.service.LibroService;
+import com.example.Biblioteca.service.CatalogoExternoService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,9 +21,26 @@ import java.util.Map;
 public class LibroRestController {
 
     private final LibroService libroService;
+    private final CatalogoExternoService catalogoExternoService;
 
-    public LibroRestController(LibroService libroService) {
+    public LibroRestController(LibroService libroService,
+                               CatalogoExternoService catalogoExternoService) {
         this.libroService = libroService;
+        this.catalogoExternoService = catalogoExternoService;
+    }
+
+    @GetMapping("/catalogo/buscar")
+    public ResponseEntity<?> buscarCatalogoExterno(
+            @RequestParam String q,
+            @RequestParam(defaultValue = "10") int limite) {
+        try {
+            return ResponseEntity.ok(catalogoExternoService.buscar(q, limite));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
     @GetMapping
