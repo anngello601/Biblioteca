@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import { getPasswordRequirements, isPasswordValid } from '../../utils/password-validation';
+import { environment } from '../../../environments/environment';
 
 
 @Component({
@@ -173,7 +174,7 @@ export class PerfilComponent {
     }
 
     // 5️⃣ Enviar la petición
-    this.http.put('http://localhost:8080/api/auth/perfil', formData)
+    this.http.put(`${environment.apiUrl}/auth/perfil`, formData)
       .subscribe({
         next: (response: any) => {
           this.cargando = false;

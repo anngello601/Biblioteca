@@ -315,7 +315,7 @@
         <p>La aplicación organiza la interfaz por páginas/componentes y usa rutas protegidas para el carrito, checkout, perfil y administración. Los servicios Angular encapsulan peticiones HTTP. El token de sesión se guarda en <code>sessionStorage</code>. El campo de dirección del checkout es de escritura manual.</p>
 
         <h3>4.5 Integración frontend-backend</h3>
-        <p>En desarrollo el frontend apunta a <code>http://localhost:8080/api</code>; el archivo de entorno de producción apunta a una URL de backend en Render. Para solicitudes protegidas, un interceptor del frontend adjunta el token JWT. CORS permite el origen local y el dominio frontend configurado en el backend.</p>
+        <p>En desarrollo el frontend apunta a <code>http://localhost:8080/api</code>; en producción consume la API en <a href="https://biblioteca-backend-3nz3.onrender.com" target="_blank" rel="noopener noreferrer">https://biblioteca-backend-3nz3.onrender.com</a> (rutas bajo <code>/api</code>). El frontend está publicado en <a href="https://biblioteca-f7gp.onrender.com" target="_blank" rel="noopener noreferrer">https://biblioteca-f7gp.onrender.com</a>. Para solicitudes protegidas, un interceptor del frontend adjunta el token JWT. CORS permite el origen local y el dominio frontend configurado en el backend.</p>
       </section>
 
       <section id="apis">
@@ -427,7 +427,7 @@
         <h3>6.1 Preparación y configuración</h3>
         <p>El backend usa Maven Wrapper; la configuración Docker declara una etapa de compilación con Maven/Temurin 25 y una etapa de ejecución Temurin 25 JRE. Las URLs de API, base de datos, almacenamiento, clave JWT y Google Books se configuran mediante propiedades de Spring.</p>
         <h3>6.2–6.5 Servidor y publicación</h3>
-        <p>El entorno de producción del frontend apunta a un backend en Render. El backend configura CORS para localhost y un origen frontend Render. La base de datos y el bucket de avatares están configurados para Supabase. Estas son configuraciones del proyecto; este documento no certifica que los servicios remotos estén activos o disponibles.</p>
+        <p>El frontend está publicado en <a href="https://biblioteca-f7gp.onrender.com" target="_blank" rel="noopener noreferrer">https://biblioteca-f7gp.onrender.com</a> y apunta al backend publicado en <a href="https://biblioteca-backend-3nz3.onrender.com" target="_blank" rel="noopener noreferrer">https://biblioteca-backend-3nz3.onrender.com</a> (API bajo <code>/api</code>). El backend configura CORS para localhost y este origen frontend. La base de datos y el bucket de avatares están configurados para Supabase. Estas son configuraciones del proyecto; este documento no certifica que los servicios remotos estén activos o disponibles.</p>
         <h3>6.6 Cloud y Docker</h3>
         <p>Docker empaqueta el backend como aplicación Java ejecutable. El frontend se construye de forma independiente con Angular. Para reproducir el despliegue hay que definir las variables de entorno en la plataforma y mantener las claves fuera del repositorio.</p>
         <div class="callout warning"><strong>Acción necesaria antes de publicar:</strong> eliminar los valores secretos predeterminados del archivo <code>application.properties</code>, rotar credenciales ya expuestas y configurar variables del entorno en el proveedor de despliegue. No compartir copias de configuración que incluyan claves.</div>
