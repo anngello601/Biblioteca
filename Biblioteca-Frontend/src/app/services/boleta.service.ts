@@ -11,9 +11,9 @@ export class BoletaService {
 
   constructor(private http: HttpClient) {}
 
-  simularPagoYape(): Observable<PagoDemo> {
+  simularPagoTarjeta(): Observable<PagoDemo> {
     return this.http.post<PagoDemo>(
-      `${this.apiUrl}/simular?metodoPago=YAPE_DEMO`,
+      `${this.apiUrl}/simular?metodoPago=TARJETA_VISA_BCP_DEMO`,
       {}
     );
   }

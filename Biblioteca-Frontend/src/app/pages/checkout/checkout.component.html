@@ -3,33 +3,59 @@
     <div class="card-body p-5 text-center">
       <i class="fas fa-clipboard-check fa-4x text-primary mb-4"></i>
       <h2 class="mb-3">Confirmar compra</h2>
-      <p class="text-muted mb-4">Prueba el flujo de pago con un QR ilustrativo de Yape. Esta demostración no realiza cobros reales.</p>
+      <p class="text-muted mb-4">Completa el formulario de tarjeta de prueba Visa BCP. Es una simulación académica: no se conecta con el banco ni realiza cobros.</p>
       <div class="mb-4 text-start">
         <label class="form-label" for="direccion">Dirección del comprador</label>
         <textarea id="direccion" class="form-control" name="direccion" rows="2"
           [(ngModel)]="direccion" autocomplete="street-address"
-          placeholder="Selecciona o escribe la dirección" required></textarea>
+          placeholder="Escribe la dirección" required></textarea>
         <div class="form-text">Dato solo para el PDF de demostración; no se guarda ni se envía al servidor.</div>
       </div>
-      <div class="mb-4">
-        <button class="btn btn-outline-primary" type="button" (click)="mostrarQr()" [disabled]="procesando">
-          <i class="fas fa-qrcode me-2"></i>Mostrar QR de demostración
-        </button>
-      </div>
-      @if (qrVisible) {
-        <div class="border rounded p-4 mb-4" role="status" aria-live="polite">
-          <i class="fas fa-qrcode fa-5x text-primary mb-3" aria-hidden="true"></i>
-          <h3 class="h5">Yape — QR de muestra</h3>
-          <p class="text-muted mb-0">No es un código escaneable y no envía dinero.</p>
+      <div class="border rounded p-4 mb-4 text-start">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h3 class="h5 mb-0"><i class="fab fa-cc-visa me-2 text-primary" aria-hidden="true"></i>Visa BCP</h3>
+          <span class="badge text-bg-warning">PRUEBA</span>
         </div>
-      }
+        <div class="alert alert-info py-2" role="note">
+          Usa solo estos datos ficticios: número <strong>4111111111111111</strong>,
+          vencimiento <strong>12/30</strong> y CVV <strong>123</strong>.
+          No ingreses una tarjeta real. Los datos no salen del navegador ni se guardan.
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="titularTarjeta">Titular de prueba</label>
+          <input id="titularTarjeta" class="form-control" name="titularTarjeta"
+            [(ngModel)]="titularTarjeta" autocomplete="off" maxlength="80" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="numeroTarjeta">Número de tarjeta de prueba</label>
+          <input id="numeroTarjeta" class="form-control" name="numeroTarjeta"
+            [(ngModel)]="numeroTarjeta" inputmode="numeric" autocomplete="off"
+            maxlength="19" required>
+        </div>
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <label class="form-label" for="vencimientoTarjeta">Vencimiento (MM/AA)</label>
+            <input id="vencimientoTarjeta" class="form-control" name="vencimientoTarjeta"
+              [(ngModel)]="vencimientoTarjeta" inputmode="numeric" autocomplete="off"
+              maxlength="5" required>
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label" for="cvvTarjeta">CVV de prueba</label>
+            <input id="cvvTarjeta" class="form-control" name="cvvTarjeta" type="password"
+              [(ngModel)]="cvvTarjeta" inputmode="numeric" autocomplete="off"
+              maxlength="3" required>
+          </div>
+        </div>
+        @if (errorTarjeta) {
+          <div class="alert alert-danger mt-3 mb-0" role="alert">{{ errorTarjeta }}</div>
+        }
       @if (error) {
         <div class="alert alert-danger" role="alert">{{ error }}</div>
       }
       <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-        <button class="btn btn-success btn-lg" (click)="confirmar()" [disabled]="!qrVisible || procesando">
+        <button class="btn btn-success btn-lg" (click)="confirmar()" [disabled]="procesando || !direccion.trim()">
           <i class="fas fa-check-circle me-2"></i>
-          {{ procesando ? 'Registrando demostración...' : 'Completar compra de demostración' }}
+          {{ procesando ? 'Simulando pago...' : 'Simular pago Visa BCP' }}
         </button>
         <a routerLink="/carrito" class="btn btn-outline-secondary btn-lg">
           <i class="fas fa-arrow-left me-1"></i> Volver al carrito

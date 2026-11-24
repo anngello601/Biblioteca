@@ -22,7 +22,7 @@ import java.util.UUID;
 @RequestMapping("/api/checkout")
 public class BoletaRestController {
 
-    private static final String METODO_PAGO_DEMO = "YAPE_DEMO";
+    private static final String METODO_PAGO_DEMO = "TARJETA_VISA_BCP_DEMO";
     private final CarritoService carritoService;
     private final LibroService libroService;
 
@@ -77,7 +77,7 @@ public class BoletaRestController {
         dto.put("id", "DEMO-" + UUID.randomUUID());
         dto.put("fecha", OffsetDateTime.now(ZoneId.of("America/Lima")));
         dto.put("total", total);
-        dto.put("metodoPago", "Yape (demostración)");
+        dto.put("metodoPago", "Tarjeta Visa BCP (demostración)");
         dto.put("estadoPago", "DEMO_NO_REAL");
         dto.put("empresa", Map.of(
                 "nombre", "NovaBook",
